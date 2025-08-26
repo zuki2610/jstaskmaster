@@ -16,42 +16,44 @@
   </header>
 
   <main class="layout-main">
-    <section id="assignment-section" class="component-panel" data-js="assignment-section"></section>
+    <!-- Sección de creación -->
+    <div class="task-create">
+      <input type="text" placeholder="Nueva tarea" data-js="task-title">
+      <button class="component-button component-button--primary" data-js="task-add">Agregar</button>
+      <button class="component-button component-button--danger" data-js="task-remove-completed">Eliminar Finalizar</button>
+    </div>
+
+    <!-- Sección de cards -->
+    <section id="assignment-section" class="assignment-section" data-js="assignment-section"></section>
   </main>
 
+  <!-- Script init + llamada a franco.js -->
   <script type="module">
-  import { mountAssignment } from "../js/franco.js";
+    import { mountAssignment } from "../js/franco.js";
 
-  // Inicializar Storage con datos de prueba si no existen
-  if (!localStorage.getItem("ttm:users")) {
-    localStorage.setItem("ttm:users", JSON.stringify([
-      { id: "user-1", name: "Ana" },
-      { id: "user-2", name: "Luis" },
-      { id: "user-3", name: "Valentina" },
-      { id: "user-4", name: "Christopher" },
-      { id: "user-5", name: "Franco" },
-      { id: "user-6", name: "Sofía" },
-      { id: "user-7", name: "Diego" },
-      { id: "user-8", name: "María" },
-      { id: "user-9", name: "Andrés" },
-      { id: "user-10", name: "Camila" }
-    ]));
-  }
+    // Inicializar Storage con datos de prueba si no existen
+    if (!localStorage.getItem("ttm:users")) {
+      localStorage.setItem("ttm:users", JSON.stringify([
+        { id: "user-1", name: "Ana" },
+        { id: "user-2", name: "Luis" },
+        { id: "user-3", name: "Carla" },
+        { id: "user-4", name: "Carlos" },
+        { id: "user-5", name: "pato" }
+      ]));
+    }
 
-  if (!localStorage.getItem("ttm:tasks")) {
-    localStorage.setItem("ttm:tasks", JSON.stringify([
-      { id: "task-1", title: "Pagar factura", assignees: [], done: false },
-      { id: "task-2", title: "Enviar reporte", assignees: ["user-2"], done: true },
-      { id: "task-3", title: "Responder correo", assignees: ["user-3"], done: true },
-      { id: "task-4", title: "Enviar solicitud", assignees: ["user-5"], done: true },
-      { id: "task-5", title: "Revisar documentación", assignees: [], done: false },
-      { id: "task-6", title: "Actualizar agenda", assignees: [], done: false }
-    ]));
-  }
+    if (!localStorage.getItem("ttm:tasks")) {
+      localStorage.setItem("ttm:tasks", JSON.stringify([
+        { id: "task-1", title: "Pagar factura", status: "pendiente", assignee: [] },
+        { id: "task-2", title: "Enviar reporte", status: "en-progreso", assignee: [] },
+        { id: "task-3", title: "Responder correo", status: "finalizada", assignee: [] },
+        { id: "task-4", title: "Enviar solicitud", status: "pendiente", assignee: [] }
+      ]));
+    }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    mountAssignment();
-  });
-</script>
+    document.addEventListener("DOMContentLoaded", () => {
+      mountAssignment();
+    });
+  </script>
 </body>
 </html>

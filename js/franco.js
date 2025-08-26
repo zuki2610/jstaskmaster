@@ -1,18 +1,14 @@
-// js/franco.js
-
-const EventBus = {
-  on: () => {},
-  emit: (eventName, payload) => console.log("Emit:", eventName, payload)
+export const EventBus = {
+  on: (event, handler) => { document.addEventListener(event, e => handler(e.detail)); },
+  emit: (event, payload) => { document.dispatchEvent(new CustomEvent(event, { detail: payload })); }
 };
 
-const Storage = {
+export const Storage = {
   get(key, fallback = []) {
     try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
     catch { return fallback; }
   },
-  set(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-  }
+  set(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 };
 
 export function mountAssignment() {
@@ -21,24 +17,35 @@ export function mountAssignment() {
 
   render();
 
-  rootEl.addEventListener("click", (e) => {
-    const taskId = e.target.closest("[data-id]")?.dataset.id;
-    if (!taskId) return;
+  document.querySelector('.task-create').addEventListener("click", e => {
+    if (e.target.matches('[data-js="task-add"]')) {
+      const input = document.querySelector('[data-js="task-title"]');
+      if (!input.value.trim()) return;
+      addTask(input.value.trim());
+      input.value = "";
+    }
+    if (e.target.matches('[data-js="task-remove-completed"]')) {
+      removeCompletedTasks();
+    }
+  });
 
+  rootEl.addEventListener("click", e => {
     if (e.target.matches('[data-js="task-toggle"]')) {
-      toggleTaskDone(taskId);
+      const id = e.target.closest("[data-id]").dataset.id;
+      toggleTaskStatus(id);
     }
-
-    if (e.target.matches('[data-js="task-assign-button"]')) {
-      const selectEl = e.target.closest("[data-id]").querySelector('[data-js="task-assign"]');
-      const selectedIds = Array.from(selectEl.selectedOptions).map(o => o.value);
-      assignTask(taskId, selectedIds);
+    if (e.target.matches('[data-js="remove-user"]')) {
+      const taskId = e.target.closest("[data-id]").dataset.id;
+      const userId = e.target.dataset.userId;
+      removeUser(taskId, userId);
     }
+  });
 
-    if (e.target.matches('[data-js="task-remove-button"]')) {
-      const selectEl = e.target.closest("[data-id]").querySelector('[data-js="task-assign"]');
-      const selectedIds = Array.from(selectEl.selectedOptions).map(o => o.value);
-      removeAssignees(taskId, selectedIds);
+  rootEl.addEventListener("change", e => {
+    if (e.target.matches('[data-js="task-assign"]')) {
+      const taskId = e.target.closest("[data-id]").dataset.id;
+      const userId = e.target.value;
+      assignTask(taskId, userId);
     }
   });
 }
@@ -48,82 +55,93 @@ function render() {
   const tasks = Storage.get("ttm:tasks", []);
   const users = Storage.get("ttm:users", []);
 
-  rootEl.innerHTML = tasks.map(t => `
-    <article class="component-task-card ${t.done ? "component-task-card--completed" : ""}" data-id="${t.id}">
+  rootEl.innerHTML = tasks.map(t =>
+    `<article class="component-task-card component-task-card--${t.status}" data-id="${t.id}">
       <h3 class="component-task-card__title">${t.title}</h3>
-
-      <div class="component-task-card__body">
-        <div class="task-users-list">
-          <select class="component-select" data-js="task-assign" multiple>
-            ${users.map(u => `
-              <option value="${u.id}" ${t.assignees && t.assignees.includes(u.id) ? "selected" : ""}>
-                ${u.name}
-              </option>
-            `).join("")}
+      <div class="component-task-card__status">
+        ${t.status === "pending" ? "Pendiente" : t.status === "in-progress" ? "En progreso" : "Completada"}
+      </div>
+      <div class="task-assignment-window">
+        <div class="task-column task-users-list">
+          <h4>Usuarios disponibles</h4>
+          <select class="component-select" data-js="task-assign">
+            <option value="">-- Asignar usuario --</option>
+            ${users.map(u => `<option value="${u.id}">${u.name}</option>`).join("")}
           </select>
         </div>
-
-        <div class="task-buttons">
-          <button class="component-button" data-js="task-toggle">
-            ${t.done ? "Reabrir" : "Completar"}
-          </button>
-          <button class="component-button component-button--secondary" data-js="task-assign-button">
-            Asignar
-          </button>
-          <button class="component-button component-button--danger" data-js="task-remove-button">
-            Remover
+        <div class="task-column task-buttons">
+          <button class="component-button component-button--secondary" data-js="task-toggle">
+            ${t.status === "done" ? "Reabrir" : t.status === "in-progress" ? "Completar" : "Iniciar"}
           </button>
         </div>
-
-        <div class="task-assigned">
-          ${t.assignees && t.assignees.length > 0
-            ? t.assignees.map(id => users.find(u => u.id === id)?.name ?? "-").join(", ")
-            : "-"}
+        <div class="task-column task-assigned">
+          <h4>Usuarios asignados</h4>
+          ${t.assignee?.length ? t.assignee.map(uId => {
+            const user = users.find(u => u.id === uId);
+            return `<div>${user?.name ?? uId} 
+                      <button class="component-button component-button--danger" data-js="remove-user" data-user-id="${uId}">X</button>
+                    </div>`;
+          }).join("") : "-"}
         </div>
       </div>
-    </article>
-  `).join("");
+    </article>`).join("");
 }
 
-function toggleTaskDone(id) {
+function addTask(title) {
+  const tasks = Storage.get("ttm:tasks", []);
+  tasks.push({ id: `task-${Date.now()}`, title, status: "pending", assignee: [] });
+  Storage.set("ttm:tasks", tasks);
+  render();
+}
+
+function toggleTaskStatus(id) {
   const tasks = Storage.get("ttm:tasks", []);
   const task = tasks.find(t => t.id === id);
   if (!task) return;
 
-  if (!task.assignees || task.assignees.length === 0) {
-    alert("Debes asignar al menos un usuario antes de completar la tarea.");
-    return;
-  }
+  if (task.status === "pending") task.status = "in-progress";
+  else if (task.status === "in-progress") task.status = "done";
+  else task.status = "pending";
 
-  task.done = !task.done;
   Storage.set("ttm:tasks", tasks);
   render();
-  EventBus.emit("ui:toggle_complete", { id });
 }
 
-function assignTask(taskId, selectedIds) {
+function removeCompletedTasks() {
+  let tasks = Storage.get("ttm:tasks", []);
+  tasks = tasks.filter(t => t.status !== "done");
+  Storage.set("ttm:tasks", tasks);
+  render();
+}
+
+function assignTask(taskId, userId) {
+  if (!userId) return;
   const tasks = Storage.get("ttm:tasks", []);
   const task = tasks.find(t => t.id === taskId);
   if (!task) return;
 
-  const current = task.assignees || [];
-  const merged = Array.from(new Set([...current, ...selectedIds]));
+  if (!task.assignee) task.assignee = [];
+  if (!task.assignee.includes(userId)) task.assignee.push(userId);
 
-  task.assignees = merged;
   Storage.set("ttm:tasks", tasks);
   render();
-  EventBus.emit("ui:assign_task", { taskId, assignees: merged });
 }
 
-function removeAssignees(taskId, selectedIds) {
+function removeUser(taskId, userId) {
   const tasks = Storage.get("ttm:tasks", []);
   const task = tasks.find(t => t.id === taskId);
-  if (!task || !task.assignees) return;
+  if (!task || !task.assignee) return;
 
-  task.assignees = task.assignees.filter(id => !selectedIds.includes(id));
+  task.assignee = task.assignee.filter(uId => uId !== userId);
   Storage.set("ttm:tasks", tasks);
   render();
-  EventBus.emit("ui:remove_assignees", { taskId, removed: selectedIds });
 }
+
+
+
+
+
+
+
 
 
