@@ -29,6 +29,7 @@ cargarTareasIniciales();
 document.addEventListener("DOMContentLoaded", () => {
   updateEstadoChart();
   updateAsignadoChart();
+  updateNotStatusChart();
 });
 
 
@@ -72,6 +73,9 @@ function updateEstadoChart() {
     }
   });
 }
+
+
+
 
 let asignadoChartInstance = null;
 
@@ -117,6 +121,72 @@ function updateAsignadoChart() {
         title: {
           display: true,
           text: `Distribución de tareas por persona (Promedio: ${promedio.toFixed(2)})`
+        }
+      }
+    }
+  });
+}
+
+
+
+
+
+let notStatusChartInstance = null;
+
+function updateNotStatusChart() {
+  const tareas = JSON.parse(localStorage.getItem("ttm:tasks")) || [];
+
+  let noAsignadas = 0;
+  let asignadasPendientes = 0;
+  let completadas = 0;
+
+  for (const tarea of tareas) {
+    const asignado = (tarea.asignado || "").trim();
+    const estado = tarea.estado === true;
+
+    if (asignado === "" || asignado === "-") {
+      noAsignadas++;
+    } else if (!estado) {
+      asignadasPendientes++;
+    } else {
+      completadas++;
+    }
+  }
+
+  const canvas = document.getElementById("not-status-chart");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  if (notStatusChartInstance) {
+    notStatusChartInstance.destroy();
+  }
+
+  notStatusChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["No asignadas", "Asignadas pendientes", "Completadas"],
+      datasets: [{
+        label: "Resumen de tareas",
+        data: [noAsignadas, asignadasPendientes, completadas],
+        backgroundColor: ["#ff9800", "#2196f3", "#4caf50"]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: {
+          display: true,
+          text: "Distribución de tareas por estado y asignación"
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0
+          }
         }
       }
     }
