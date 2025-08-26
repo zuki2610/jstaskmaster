@@ -71,9 +71,15 @@
       <h2 class="component-panel__title">Estadísticas</h2>
       <p class="utility-muted">Próximamente: gráficos de avance, rendimiento del equipo y más.</p>
       <div class="stats-grid">
-        <div class="stats-card stats-card--img charts-a" aria-hidden="true"></div>
-        <div class="stats-card stats-card--img charts-b" aria-hidden="true"></div>
-        <div class="stats-card stats-card--img charts-c" aria-hidden="true"></div>
+        <div class="stats-card stats-card--img charts-a" aria-hidden="true">
+          <canvas id="task-status-chart" width="300" height="300"></canvas>
+        </div>
+        <div class="stats-card stats-card--img charts-b" aria-hidden="true">
+          <canvas id="asign-status-chart" width="300" height="300"></canvas>
+        </div>
+        <div class="stats-card stats-card--img charts-c" aria-hidden="true">
+
+        </div>
       </div>
     </section>
   </main>
@@ -81,7 +87,11 @@
   <footer class="layout-footer utility-text-center">
     <small>© 2025 Task Team Manager <br> Grupo 1 </small>
   </footer>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <script src="../js/christopher.js"></script>
   <script src="../js/login.js"></script>
+  
+ 
+  
 </body>
 </html>
