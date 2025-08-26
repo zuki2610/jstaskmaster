@@ -69,8 +69,55 @@ body{ background: var(--bg-color); color: var(--text-color); }
 .brand__text{ display:flex; flex-direction:column; line-height:1.1; }
 .brand__text small{ color: var(--muted-color); }
 
-.layout-main{ padding: var(--space-8); display: grid; gap: var(--space-8); max-width: 1200px; margin: 0 auto; }
-.layout-footer{ padding: var(--space-6) var(--space-8); border-top: 1px solid var(--border-color); color: var(--muted-color); }
+.layout-main{ 
+  min-height: calc(100vh - 80px); /* Ajusta 80px según la altura de tu header y footer */
+  padding: var(--space-8); 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-8); 
+  max-width: 1200px; 
+  margin: 0 auto; 
+}
+.layout-footer{ 
+  padding: var(--space-6) var(--space-8); 
+  border-top: 1px solid var(--border-color); 
+  color: var(--muted-color); 
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: #fff; /* O el color que prefieras */
+  z-index: 100;
+  padding: 10px 0;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+/* Centrar el panel de login */
+[data-js="auth-section"] {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centrar el contenido de auth-section */
+.auth-grid {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh; /* Ajusta según lo que necesites */
+}
+
+.auth-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
 .component-panel{
   background: var(--panel-color);
@@ -78,6 +125,11 @@ body{ background: var(--bg-color); color: var(--text-color); }
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
   padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh; /* Ajusta según lo que necesites */
 }
 
 /* === components.css === */
@@ -209,4 +261,15 @@ body{ background: var(--bg-color); color: var(--text-color); }
   .auth-grid__image{ display:none; }
   .board{ grid-template-columns: 1fr; }
   .stats-grid{ grid-template-columns: 1fr; }
+}
+
+/* Centrar el panel de login horizontal y verticalmente */
+.auth-grid[data-js="auth-section"] {
+  width: 30vw;
+  min-height: 60vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
