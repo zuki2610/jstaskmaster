@@ -279,8 +279,15 @@ function hideAppSections(){
   document.querySelector('[data-js="stats-section"]').classList.add("utility-hidden");
 }
 function showAppSections(){
-  document.querySelector('[data-js="tasks-section"]').classList.remove("utility-hidden");
-  document.querySelector('[data-js="stats-section"]').classList.remove("utility-hidden");
+  const stats = document.querySelector('[data-js="stats-section"]');
+  const tasks = document.querySelector('[data-js="tasks-section"]');
+
+  tasks.classList.remove("utility-hidden"); //añadi esto para que cargue los graficos este la sesion iniciada o si recien se inicia
+  stats.classList.remove("utility-hidden");
+
+  setTimeout(() => {
+    EventBus.emit("stats:ready");
+  }, 50);
 }
 
 

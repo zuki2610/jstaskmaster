@@ -195,3 +195,18 @@ function updateNotStatusChart() {
     }
   });
 }
+
+
+function initStatsSection() {
+  updateEstadoChart();
+  updateAsignadoChart();
+  updateNotStatusChart();
+}
+
+EventBus.on("app:user_logged_in", () => {
+  setTimeout(initStatsSection, 100);
+});
+
+EventBus.on("stats:ready", () => {
+  initStatsSection();
+});
