@@ -26,10 +26,13 @@ cargarTareasIniciales();
 
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateEstadoChart();
-  updateAsignadoChart();
-  updateNotStatusChart();
+EventBus.on("app:user_logged_in", () => {
+  // Asegura que el DOM ya está listo
+  setTimeout(() => {
+    updateEstadoChart();
+    updateAsignadoChart();
+    updateNotStatusChart();
+  }, 100); // Pequeño delay por seguridad visual
 });
 
 
