@@ -263,7 +263,7 @@ body{ background: var(--bg-color); color: var(--text-color); }
   .stats-grid{ grid-template-columns: 1fr; }
 }
 
-/* Centrar el panel de login horizontal y verticalmente */
+
 .auth-grid[data-js="auth-section"] {
   width: 30vw;
   min-height: 60vh;
@@ -273,3 +273,189 @@ body{ background: var(--bg-color); color: var(--text-color); }
   justify-content: center;
   align-items: center;
 }
+
+/* SECCION TAREAS */
+/* src/assets/style.css */
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #f5f5f5; /* fondo suave tipo Trello */
+  color: #192b22;
+  line-height: 1.5;
+}
+
+/* Layout principal */
+.layout-main {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.component-task-card {
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0.3); /* borde negro más visible */
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  padding: 1rem;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Hover - tarjeta se eleva */
+.component-task-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.component-task-card--completed {
+  background: #e6f7e6;
+  text-decoration: line-through;
+}
+
+
+/* Nombre de tarea */
+.component-task-card__title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+/* Body interno */
+.component-task-card__body {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+/* Columnas internas */
+.task-users-list {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+}
+
+.task-users-list .component-select {
+  flex: 1;
+}
+
+.task-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 100px;
+}
+
+.task-assigned {
+  flex: 1;
+  min-width: 150px;
+  padding-left: 0.5rem;
+  font-weight: bold;
+}
+
+/* Botones */
+.component-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgb(226, 153, 86);
+  color: white;
+  font-weight: bold;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.component-button:hover {
+  background: rgb(200, 130, 70);
+}
+
+.component-button--secondary {
+  background: rgb(156, 92, 76);
+}
+
+.component-button--secondary:hover {
+  background: rgb(130, 70, 50);
+}
+
+.component-button--danger {
+  background: #d9534f;
+}
+
+.component-button--danger:hover {
+  background: #c12e2a;
+}
+
+/* Select */
+.component-select {
+  padding: 0.4rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+/* Responsive general */
+@media (max-width: 600px) {
+  .component-task-card {
+    max-width: 100%;
+  }
+
+  .component-task-card__body {
+    flex-direction: column;
+  }
+
+  .task-assigned {
+    padding-left: 0;
+  }
+
+  .task-users-list .component-select {
+    flex: unset;
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 400px) {
+  .component-task-card__body {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .task-users-list,
+  .task-buttons,
+  .task-assigned {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .task-users-list .component-select {
+    flex: unset;
+  }
+
+  .task-buttons .component-button {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .component-task-card {
+    padding: 0.8rem;
+  }
+}
+
+
+
+
