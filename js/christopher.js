@@ -4,47 +4,50 @@ const STORAGE_KEY = "ttm:tasks";
 const API_URL = "https://68a8eeb4b115e67576ea102a.mockapi.io/tareas";
 
 async function cargarTareasIniciales() {
-  const yaExisten = localStorage.getItem(STORAGE_KEY);
+  let tareasLocal = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
-  if (!yaExisten) {
+  if (tareasLocal.length === 0) {
     try {
       const response = await fetch(API_URL);
       if (!response.ok) throw new Error("Error al obtener las tareas desde la API");
-      
-      const tareas = await response.json();
+
+      let tareas = await response.json();
+
+      tareas = tareas.map(t => ({
+        id: t.id,
+        title: t.title || "-",
+        asignado: t.asignado || "-",
+        descripcion: t.descripcion || "-",
+        column: t.column || "backlog"
+      }));
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tareas));
-      console.log("Tareas cargadas y guardadas en localStorage por primera vez.");
+      console.log("Tareas cargadas desde API y guardadas en localStorage.");
     } catch (error) {
       console.error("Fallo al cargar tareas:", error);
     }
   } else {
-    console.log("Tareas ya existen en localStorage. No se hace fetch.");
+    console.log("Tareas ya existen en localStorage, no se hace fetch.");
   }
 }
 
 cargarTareasIniciales();
 
 
-
+// ------------------- GRAFICOS -------------------
 EventBus.on("app:user_logged_in", () => {
-  // Asegura que el DOM ya está listo
-  setTimeout(() => {
-    updateEstadoChart();
-    updateAsignadoChart();
-    updateNotStatusChart();
-  }, 100); // Pequeño delay por seguridad visual
+  setTimeout(initStatsSection, 100);
+});
+EventBus.on("stats:ready", () => {
+  initStatsSection();
 });
 
 
-
-
-
 let estadoChartInstance = null;
-
 function updateEstadoChart() {
-  const tareas = JSON.parse(localStorage.getItem("ttm:tasks")) || [];
+  const tareas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-  const completadas = tareas.filter(t => t.estado === true).length;
+  const completadas = tareas.filter(t => t.column === "done").length;
   const pendientes = tareas.length - completadas;
 
   const canvas = document.getElementById("task-status-chart");
@@ -68,26 +71,20 @@ function updateEstadoChart() {
       responsive: true,
       plugins: {
         legend: { position: 'bottom' },
-        title: {
-          display: true,
-          text: 'Estado actual de las tareas'
-        }
+        title: { display: true, text: 'Estado actual de las tareas' }
       }
     }
   });
 }
 
 
-
-
 let asignadoChartInstance = null;
-
 function updateAsignadoChart() {
-  const tareas = JSON.parse(localStorage.getItem("ttm:tasks")) || [];
+  const tareas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
   const conteoPorPersona = {};
   for (const tarea of tareas) {
-    const persona = tarea.asignado || "Sin asignar";
+    const persona = tarea.asignado && tarea.asignado !== "-" ? tarea.asignado : "Sin asignar";
     conteoPorPersona[persona] = (conteoPorPersona[persona] || 0) + 1;
   }
 
@@ -101,10 +98,7 @@ function updateAsignadoChart() {
 
   const ctx = canvas.getContext("2d");
 
-  // Destruir gráfico anterior si ya existe
-  if (asignadoChartInstance) {
-    asignadoChartInstance.destroy();
-  }
+  if (asignadoChartInstance) asignadoChartInstance.destroy();
 
   asignadoChartInstance = new Chart(ctx, {
     type: "doughnut",
@@ -131,13 +125,9 @@ function updateAsignadoChart() {
 }
 
 
-
-
-
 let notStatusChartInstance = null;
-
 function updateNotStatusChart() {
-  const tareas = JSON.parse(localStorage.getItem("ttm:tasks")) || [];
+  const tareas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
   let noAsignadas = 0;
   let asignadasPendientes = 0;
@@ -145,11 +135,11 @@ function updateNotStatusChart() {
 
   for (const tarea of tareas) {
     const asignado = (tarea.asignado || "").trim();
-    const estado = tarea.estado === true;
+    const column = tarea.column;
 
     if (asignado === "" || asignado === "-") {
       noAsignadas++;
-    } else if (!estado) {
+    } else if (column !== "done") {
       asignadasPendientes++;
     } else {
       completadas++;
@@ -161,9 +151,7 @@ function updateNotStatusChart() {
 
   const ctx = canvas.getContext("2d");
 
-  if (notStatusChartInstance) {
-    notStatusChartInstance.destroy();
-  }
+  if (notStatusChartInstance) notStatusChartInstance.destroy();
 
   notStatusChartInstance = new Chart(ctx, {
     type: "bar",
@@ -179,18 +167,10 @@ function updateNotStatusChart() {
       responsive: true,
       plugins: {
         legend: { display: false },
-        title: {
-          display: true,
-          text: "Distribución de tareas por estado y asignación"
-        }
+        title: { display: true, text: "Distribución de tareas por estado y asignación" }
       },
       scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            precision: 0
-          }
-        }
+        y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
   });
@@ -202,11 +182,3 @@ function initStatsSection() {
   updateAsignadoChart();
   updateNotStatusChart();
 }
-
-EventBus.on("app:user_logged_in", () => {
-  setTimeout(initStatsSection, 100);
-});
-
-EventBus.on("stats:ready", () => {
-  initStatsSection();
-});

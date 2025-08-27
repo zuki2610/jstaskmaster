@@ -285,6 +285,8 @@ function showAppSections(){
   tasks.classList.remove("utility-hidden"); //añadi esto para que cargue los graficos este la sesion iniciada o si recien se inicia
   stats.classList.remove("utility-hidden");
 
+
+
   setTimeout(() => {
     EventBus.emit("stats:ready");
   }, 50);
@@ -338,35 +340,44 @@ function initBoard(){
     const column = (fd.get("column") || "backlog").toString();
     if (!title) return;
     const tasks = Storage.get(TASKS_KEY, []);
-    tasks.push({ id: `t_${Date.now()}`, title, column });
+    tasks.push({ id: `t_${Date.now()}`, title, column, asignado: "-", descripcion: "-" });
     Storage.set(TASKS_KEY, tasks);
     form.reset();
     renderBoard();
+    if (typeof initStatsSection === "function") {
+  initStatsSection();
+  }
   });
 
   document.querySelector('[data-js="tasks-section"]').addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
-    if (btn.matches('[data-js="delete"]')){
-      const id = btn.getAttribute("data-id");
-      Storage.set(TASKS_KEY, Storage.get(TASKS_KEY, []).filter(t => t.id !== id));
-      renderBoard();
-    }
-    if (btn.matches('[data-js="move"]')){
-      const id = btn.getAttribute("data-id");
-      const tasks = Storage.get(TASKS_KEY, []);
-      const idx = tasks.findIndex(t => t.id === id);
-      if (idx >= 0){
-        const order = ["backlog","inprogress","done"];
-        const next = order[(order.indexOf(tasks[idx].column)+1)%order.length];
-        tasks[idx].column = next;
-        Storage.set(TASKS_KEY, tasks);
-        renderBoard();
-      }
-    }
-  });
+  const btn = e.target.closest("button");
+  if (!btn) return;
 
-  renderBoard();
+  if (btn.matches('[data-js="delete"]')){
+    const id = btn.getAttribute("data-id");
+    Storage.set(TASKS_KEY, Storage.get(TASKS_KEY, []).filter(t => t.id !== id));
+    renderBoard();
+    if (typeof initStatsSection === "function") initStatsSection(); //actualiza graficos
+  }
+  if (btn.matches('[data-js="move"]')){
+    const id = btn.getAttribute("data-id");
+    const tasks = Storage.get(TASKS_KEY, []);
+    const idx = tasks.findIndex(t => t.id === id);
+
+    if (idx >= 0){
+      const order = ["backlog","inprogress","done"];
+      const next = order[(order.indexOf(tasks[idx].column)+1) % order.length];
+      tasks[idx].column = next;
+
+      Storage.set(TASKS_KEY, tasks);
+      renderBoard();
+      if (typeof initStatsSection === "function") initStatsSection(); //actualiza graficos
+    }
+  }
+});
+
+renderBoard();
+
 }
 
 
