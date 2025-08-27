@@ -358,12 +358,15 @@ function hideAppSections() {
     .classList.add("utility-hidden");
 }
 function showAppSections() {
-  document
-    .querySelector('[data-js="tasks-section"]')
-    .classList.remove("utility-hidden");
-  document
-    .querySelector('[data-js="stats-section"]')
-    .classList.remove("utility-hidden");
+  const stats = document.querySelector('[data-js="stats-section"]');
+  const tasks = document.querySelector('[data-js="tasks-section"]');
+
+  tasks.classList.remove("utility-hidden"); //añadi esto para que cargue los graficos este la sesion iniciada o si recien se inicia
+  stats.classList.remove("utility-hidden");
+
+  setTimeout(() => {
+    EventBus.emit("stats:ready");
+  }, 50);
 }
 
 function updateNavVisibility(isLogged = !!Storage.get(SESSION_KEY)) {
@@ -429,13 +432,15 @@ function initBoard() {
       id: `t_${Date.now()}`,
       title,
       column,
-      description: "",
-      asignee: "",
+      asignado: "-",
+      descripcion: "-",
     });
     Storage.set(TASKS_KEY, tasks);
     form.reset();
     renderBoard();
-    console.log("initBoard");
+    if (typeof initStatsSection === "function") {
+      initStatsSection();
+    }
   });
 
   document
@@ -443,6 +448,7 @@ function initBoard() {
     .addEventListener("click", (e) => {
       const btn = e.target.closest("button");
       if (!btn) return;
+
       if (btn.matches('[data-js="delete"]')) {
         const id = btn.getAttribute("data-id");
         Storage.set(
@@ -450,18 +456,22 @@ function initBoard() {
           Storage.get(TASKS_KEY, []).filter((t) => t.id !== id)
         );
         renderBoard();
+        if (typeof initStatsSection === "function") initStatsSection(); //actualiza graficos
       }
       if (btn.matches('[data-js="move"]')) {
         const id = btn.getAttribute("data-id");
         const tasks = Storage.get(TASKS_KEY, []);
         const idx = tasks.findIndex((t) => t.id === id);
+
         if (idx >= 0) {
           const order = ["backlog", "inprogress", "done"];
           const next =
             order[(order.indexOf(tasks[idx].column) + 1) % order.length];
           tasks[idx].column = next;
+
           Storage.set(TASKS_KEY, tasks);
           renderBoard();
+          if (typeof initStatsSection === "function") initStatsSection(); //actualiza graficos
         }
       }
     });

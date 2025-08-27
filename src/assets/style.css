@@ -118,8 +118,14 @@ body {
 }
 
 .layout-main {
+  min-height: calc(
+    100vh - 80px
+  ); /* Ajusta 80px según la altura de tu header y footer */
   padding: var(--space-8);
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: var(--space-8);
   max-width: 1200px;
   margin: 0 auto;
@@ -128,6 +134,39 @@ body {
   padding: var(--space-6) var(--space-8);
   border-top: 1px solid var(--border-color);
   color: var(--muted-color);
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: #fff; /* O el color que prefieras */
+  z-index: 100;
+  padding: 10px 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Centrar el panel de login */
+[data-js="auth-section"] {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centrar el contenido de auth-section */
+.auth-grid {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh; /* Ajusta según lo que necesites */
+}
+
+.auth-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .component-panel {
@@ -136,6 +175,11 @@ body {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
   padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh; /* Ajusta según lo que necesites */
 }
 
 /* === components.css === */
@@ -360,24 +404,13 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-6);
 }
-.stats-card {
-  height: 220px;
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-soft);
-}
+/* .stats-card{
+  height: 220px; border-radius: 16px;
+  border: 1px solid var(--border-color); box-shadow: var(--shadow-soft);
+} */
 .stats-card--img {
   background-size: cover;
   background-position: center;
-}
-.charts-a {
-  background-image: url("https://images.unsplash.com/photo-1551281044-8b29a0fd3d54?q=80&w=1200&auto=format&fit=crop");
-}
-.charts-b {
-  background-image: url("https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1200&auto=format&fit=crop");
-}
-.charts-c {
-  background-image: url("https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop");
 }
 
 /* Responsive */
@@ -394,4 +427,15 @@ body {
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Centrar el panel de login horizontal y verticalmente */
+.auth-grid[data-js="auth-section"] {
+  width: 30vw;
+  min-height: 60vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

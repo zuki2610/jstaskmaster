@@ -41,7 +41,11 @@
     </header>
 
     <main class="layout-main">
-      <section class="component-panel auth-grid" data-js="auth-section">
+      <section
+        class="component-panel auth-grid"
+        data-js="auth-section"
+        style="width: 30vw"
+      >
         <div
           class="auth-grid__image auth-grid__image--left"
           aria-hidden="true"
@@ -100,18 +104,15 @@
           Próximamente: gráficos de avance, rendimiento del equipo y más.
         </p>
         <div class="stats-grid">
-          <div
-            class="stats-card stats-card--img charts-a"
-            aria-hidden="true"
-          ></div>
-          <div
-            class="stats-card stats-card--img charts-b"
-            aria-hidden="true"
-          ></div>
-          <div
-            class="stats-card stats-card--img charts-c"
-            aria-hidden="true"
-          ></div>
+          <div class="stats-card stats-card--img charts-a" aria-hidden="true">
+            <canvas id="task-status-chart" width="300" height="300"></canvas>
+          </div>
+          <div class="stats-card stats-card--img charts-b" aria-hidden="true">
+            <canvas id="asign-status-chart" width="300" height="300"></canvas>
+          </div>
+          <div class="stats-card stats-card--img charts-c" aria-hidden="true">
+            <canvas id="not-status-chart" width="300" height="300"></canvas>
+          </div>
         </div>
       </section>
     </main>
@@ -122,8 +123,10 @@
         Grupo 1
       </small>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script src="../js/login.js"></script>
     <script src="../js/crudTareas.js"></script>
+    <script src="../js/christopher.js"></script>
   </body>
 </html>
