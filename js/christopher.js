@@ -1,4 +1,4 @@
-
+//para cargar las tareas desde la api
 
 const STORAGE_KEY = "ttm:tasks";
 const API_URL = "https://68a8eeb4b115e67576ea102a.mockapi.io/tareas";
@@ -34,7 +34,12 @@ async function cargarTareasIniciales() {
 cargarTareasIniciales();
 
 
-// ------------------- GRAFICOS -------------------
+
+
+
+//aqui empiezan los graficos
+
+
 EventBus.on("app:user_logged_in", () => {
   setTimeout(initStatsSection, 100);
 });
@@ -63,7 +68,7 @@ function updateEstadoChart() {
       datasets: [{
         label: "Estado de tareas",
         data: [completadas, pendientes],
-        backgroundColor: ["#4caf50", "#f44336"],
+        backgroundColor: ["rgb(226, 153, 86)", "rgb(156, 92, 76)"],
         borderWidth: 1
       }]
     },
@@ -79,6 +84,16 @@ function updateEstadoChart() {
 
 
 let asignadoChartInstance = null;
+
+const PALETA_PERSONAS = [
+  "#BF9064",
+  "#9A7F67",
+  "#E39A56",
+  "#766A5F",
+  "#514B45",
+  "#332B24"
+];
+
 function updateAsignadoChart() {
   const tareas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
@@ -95,7 +110,6 @@ function updateAsignadoChart() {
 
   const canvas = document.getElementById("asign-status-chart");
   if (!canvas) return;
-
   const ctx = canvas.getContext("2d");
 
   if (asignadoChartInstance) asignadoChartInstance.destroy();
@@ -107,7 +121,7 @@ function updateAsignadoChart() {
       datasets: [{
         label: "Tareas por persona",
         data: cantidades,
-        backgroundColor: personas.map((_, i) => `hsl(${i * 60}, 70%, 60%)`),
+        backgroundColor: personas.map((_, i) => PALETA_PERSONAS[i % PALETA_PERSONAS.length]),
         borderWidth: 1
       }]
     },
@@ -160,7 +174,7 @@ function updateNotStatusChart() {
       datasets: [{
         label: "Resumen de tareas",
         data: [noAsignadas, asignadasPendientes, completadas],
-        backgroundColor: ["#ff9800", "#2196f3", "#4caf50"]
+        backgroundColor: ["rgb(25, 43, 34)", "rgb(226, 153, 86)", "rgb(156, 92, 76)"]
       }]
     },
     options: {
