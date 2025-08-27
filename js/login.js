@@ -396,15 +396,14 @@ function qs(sel) {
 }
 
 function renderBoard() {
-  console.log("renderboard");
-
   const tasks = Storage.get(TASKS_KEY, []);
   const cols = {
     backlog: qs('[data-js="col-backlog"]'),
     inprogress: qs('[data-js="col-inprogress"]'),
     done: qs('[data-js="col-done"]'),
   };
-  Object.values(cols).forEach((el) => el && (el.innerHTML = ""));
+
+  Object.values(cols).forEach((el) => (el.innerHTML = ""));
   for (const t of tasks) {
     const el = document.createElement("div");
     el.className = "component-card";
@@ -421,6 +420,7 @@ function renderBoard() {
     el.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("text/plain", t.id);
     });
+
     cols[t.column]?.appendChild(el);
     el.onclick = (e) => {
       const target = e.target;
@@ -433,12 +433,10 @@ function renderBoard() {
       renderEditTask(t.id);
     };
   }
+  
   for (const [colKey, colEl] of Object.entries(cols)) {
-    colEl.addEventListener("dragover", (e) => {
-      e.preventDefault();
-    });
-
-    colEl.addEventListener("drop", (e) => {
+    colEl.ondragover = (e) => e.preventDefault();
+    colEl.ondrop = (e) => {
       e.preventDefault();
       const id = e.dataTransfer.getData("text/plain");
       const tasks = Storage.get(TASKS_KEY, []);
@@ -449,7 +447,7 @@ function renderBoard() {
         renderBoard();
         if (typeof initStatsSection === "function") initStatsSection();
       }
-    });
+    };
   }
 }
 
