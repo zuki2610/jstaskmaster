@@ -33,8 +33,9 @@ textarea {
   --c-secondary: 25, 43, 34;
   --c-accent: 156, 92, 76;
 
-  --bg: 255, 255, 255; /* Fondo: white */
-  --panel: 248, 249, 251;
+  --bg: 248, 239, 230;
+  --panel: 244, 231, 223;
+  --bg-column: 236, 203, 180;
   --border: 228, 232, 240;
   --text: 17, 24, 39;
   --muted: 107, 114, 128;
@@ -54,6 +55,7 @@ textarea {
 html[data-theme="dark"] {
   --bg: 12, 18, 38; /* base azul profundo */
   --panel: 17, 24, 39;
+  --bg-column: 12, 18, 38;
   --border: 36, 49, 77;
   --text: 229, 231, 235;
   --muted: 156, 163, 175;
@@ -364,7 +366,7 @@ body {
   gap: var(--space-6);
 }
 .board__col {
-  background: rgba(var(--bg), 0.65);
+  background: rgba(var(--bg-column), 0.65);
   border: 1px dashed var(--border-color);
   border-radius: 16px;
   padding: var(--space-4);
