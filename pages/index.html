@@ -13,6 +13,7 @@
     />
 
     <link rel="stylesheet" href="../src/assets/style.css" />
+    <link rel="stylesheet" href="../src/assets/modal.css" />
   </head>
   <body>
     <header class="layout-header">
@@ -42,9 +43,8 @@
 
     <main class="layout-main">
       <section
-        class="component-panel auth-grid"
+        class="component-panel section-header auth-grid"
         data-js="auth-section"
-        style="width: 30vw"
       >
         <div
           class="auth-grid__image auth-grid__image--left"
@@ -56,7 +56,11 @@
         ></div>
       </section>
 
-      <section class="component-panel utility-hidden" data-js="tasks-section">
+      <section
+        class="component-panel utility-hidden"
+        data-js="tasks-section"
+        id="tasks-board"
+      >
         <div class="component-panel__title-row">
           <h2 class="component-panel__title">Tablero de tareas</h2>
           <div class="board-actions">

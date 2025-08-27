@@ -15,6 +15,7 @@ const EventBus = (() => {
     },
   };
 })();
+
 const Storage = {
   get(key, fallback = null) {
     try {
@@ -328,7 +329,7 @@ function render(rootEl) {
       <h2 class="component-panel__title">Bienvenido, ${me.name} 👋</h2>
       <p class="utility-muted">Tu sesión está activa. Puedes continuar al tablero de tareas.</p>
       <div class="utility-margin-top-4 utility-flex utility-gap-4">
-        <a class="component-button" href="#" data-js="go-tasks">Ir a Tareas</a>
+        <a class="component-button" href="#tasks-board" data-js="go-tasks">Ir a Tareas</a>
         <button class="component-button component-button--ghost" data-js="do-logout">Cerrar sesión</button>
       </div>
     </div>
@@ -364,9 +365,19 @@ function showAppSections() {
   tasks.classList.remove("utility-hidden"); //añadi esto para que cargue los graficos este la sesion iniciada o si recien se inicia
   stats.classList.remove("utility-hidden");
 
+  document
+    .querySelector('[data-js="auth-section"]')
+    ?.classList.add("section-header--condensed");
+
   setTimeout(() => {
     EventBus.emit("stats:ready");
   }, 50);
+
+  setTimeout(() => {
+    document
+      .getElementById("tasks-board")
+      ?.scrollIntoView({ behavior: "smooth" });
+  }, 100); // espera a que se remueva la clase 'utility-hidden'
 }
 
 function updateNavVisibility(isLogged = !!Storage.get(SESSION_KEY)) {
@@ -385,6 +396,8 @@ function qs(sel) {
 }
 
 function renderBoard() {
+  console.log("renderboard");
+
   const tasks = Storage.get(TASKS_KEY, []);
   const cols = {
     backlog: qs('[data-js="col-backlog"]'),
@@ -394,9 +407,8 @@ function renderBoard() {
   Object.values(cols).forEach((el) => el && (el.innerHTML = ""));
   for (const t of tasks) {
     const el = document.createElement("div");
-    el.className = "card";
+    el.className = "component-card";
     el.setAttribute("data-js", "task-card");
-    el.onclick = () => renderEditTask(t);
     el.innerHTML = `
       <span class="card__title">${escapeHtml(t.title)}</span>
       <span class="card__actions">
@@ -405,6 +417,16 @@ function renderBoard() {
       </span>
     `;
     cols[t.column]?.appendChild(el);
+    el.onclick = (e) => {
+      const target = e.target;
+      if (
+        target.closest('[data-js="delete"]') ||
+        target.closest('[data-js="move"]')
+      ) {
+        return;
+      }
+      renderEditTask(t.id);
+    };
   }
 }
 
@@ -432,8 +454,8 @@ function initBoard() {
       id: `t_${Date.now()}`,
       title,
       column,
-      asignado: "-",
-      descripcion: "-",
+      asignado: "",
+      descripcion: "",
     });
     Storage.set(TASKS_KEY, tasks);
     form.reset();
@@ -451,12 +473,7 @@ function initBoard() {
 
       if (btn.matches('[data-js="delete"]')) {
         const id = btn.getAttribute("data-id");
-        Storage.set(
-          TASKS_KEY,
-          Storage.get(TASKS_KEY, []).filter((t) => t.id !== id)
-        );
-        renderBoard();
-        if (typeof initStatsSection === "function") initStatsSection(); //actualiza graficos
+        renderDeleteConfirmation(id);
       }
       if (btn.matches('[data-js="move"]')) {
         const id = btn.getAttribute("data-id");
@@ -476,14 +493,17 @@ function initBoard() {
       }
     });
 
-  renderBoard();
+  setTimeout(() => {
+    renderBoard();
+  }, 100);
 }
 
 const authRoot = qs('[data-js="auth-section"]');
 initTheme();
 mountAuth(authRoot);
-initBoard();
-// renderEditTask();
+setTimeout(() => {
+  initBoard();
+}, 100);
 
 EventBus.on("app:user_logged_in", ({ user }) => {
   console.log("Usuario logueado:", user.email);

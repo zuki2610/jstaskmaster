@@ -38,6 +38,7 @@ textarea {
   --border: 228, 232, 240;
   --text: 17, 24, 39;
   --muted: 107, 114, 128;
+  --danger: 173, 7, 24;
 
   --radius-xl: 16px;
   --space-2: 0.5rem;
@@ -56,6 +57,7 @@ html[data-theme="dark"] {
   --border: 36, 49, 77;
   --text: 229, 231, 235;
   --muted: 156, 163, 175;
+  --danger: 184, 35, 50;
   /* Colores del usuario se mantienen */
 }
 
@@ -134,13 +136,11 @@ body {
   padding: var(--space-6) var(--space-8);
   border-top: 1px solid var(--border-color);
   color: var(--muted-color);
-  position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
-  background: #fff; /* O el color que prefieras */
-  z-index: 100;
-  padding: 10px 0;
+  background: rgb(var(--panel));
+  padding: var(--space-8) 0;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -151,6 +151,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 /* Centrar el contenido de auth-section */
@@ -160,6 +161,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 60vh; /* Ajusta según lo que necesites */
+  width: 100%;
 }
 
 .auth-box {
@@ -167,6 +169,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .component-panel {
@@ -179,7 +182,8 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 50vh; /* Ajusta según lo que necesites */
+  min-height: 50vh;
+  width: 100%; /* Ajusta según lo que necesites */
 }
 
 /* === components.css === */
@@ -203,7 +207,7 @@ body {
   font-weight: 700;
   transition: transform 0.06s ease, opacity 0.2s ease, background 0.2s ease,
     box-shadow 0.2s ease;
-  box-shadow: 0 4px 14px rgba(var(--c-primary), 0.25);
+  box-shadow: 0 4px 14px rgba(var(--shadow-soft), 0.25);
 }
 .component-button:hover {
   transform: translateY(-1px);
@@ -222,11 +226,25 @@ body {
   color: var(--text-color);
 }
 
+.component-button--danger {
+  background: rgb(var(--danger));
+  color: white;
+  font-weight: 600;
+  text-decoration: wavy underline;
+}
+
+.component-button--danger__taskModal {
+  background: transparent;
+  color: rgb(var(--danger));
+  font-weight: 600;
+  text-decoration: wavy underline;
+}
+
 /* Forms */
 .component-form {
   display: grid;
   gap: var(--space-4);
-  max-width: 460px;
+  width: 45%;
 }
 .component-form__row {
   display: grid;
@@ -362,7 +380,7 @@ body {
   gap: var(--space-3);
   min-height: 60px;
 }
-.card {
+.component-card {
   background: var(--panel-color);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -427,15 +445,49 @@ body {
   .stats-grid {
     grid-template-columns: 1fr;
   }
+
+  .component-form {
+    display: grid;
+    gap: var(--space-4);
+    width: 65%;
+  }
 }
 
 /* Centrar el panel de login horizontal y verticalmente */
 .auth-grid[data-js="auth-section"] {
-  width: 30vw;
-  min-height: 60vh;
+  width: 100%;
+  height: auto;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: var(--space-4);
+}
+
+.section-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-6) var(--space-8);
+}
+
+.section-header--condensed {
+  padding: 0.5rem 1rem;
+  height: auto;
+  min-height: unset;
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--panel-color);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s ease-in-out;
+}
+
+.section-header--condensed .auth-section {
+  display: none;
+}
+
+#tasks-board {
+  scroll-margin-top: 6rem;
 }
