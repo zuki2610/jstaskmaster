@@ -377,7 +377,7 @@ function showAppSections() {
     document
       .getElementById("tasks-board")
       ?.scrollIntoView({ behavior: "smooth" });
-  }, 100); // espera a que se remueva la clase 'utility-hidden'
+  }, 100);
 }
 
 function updateNavVisibility(isLogged = !!Storage.get(SESSION_KEY)) {
@@ -409,6 +409,8 @@ function renderBoard() {
     const el = document.createElement("div");
     el.className = "component-card";
     el.setAttribute("data-js", "task-card");
+    el.setAttribute("id", `drag-${t.id}`);
+    el.setAttribute("draggable", "true");
     el.innerHTML = `
       <span class="card__title">${escapeHtml(t.title)}</span>
       <span class="card__actions">
@@ -416,6 +418,9 @@ function renderBoard() {
         <button class="card__btn" data-js="delete" data-id="${t.id}">🗑</button>
       </span>
     `;
+    el.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", t.id);
+    });
     cols[t.column]?.appendChild(el);
     el.onclick = (e) => {
       const target = e.target;
@@ -427,6 +432,24 @@ function renderBoard() {
       }
       renderEditTask(t.id);
     };
+  }
+  for (const [colKey, colEl] of Object.entries(cols)) {
+    colEl.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+
+    colEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData("text/plain");
+      const tasks = Storage.get(TASKS_KEY, []);
+      const idx = tasks.findIndex((t) => t.id === id);
+      if (idx >= 0) {
+        tasks[idx].column = colKey;
+        Storage.set(TASKS_KEY, tasks);
+        renderBoard();
+        if (typeof initStatsSection === "function") initStatsSection();
+      }
+    });
   }
 }
 
