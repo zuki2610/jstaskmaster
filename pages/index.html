@@ -1,87 +1,129 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es" data-theme="light">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Task Team Manager</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Task Team Manager</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+      rel="stylesheet"
+    />
 
-  <link rel="stylesheet" href="../src/assets/style.css" />
-</head>
-<body>
-  <header class="layout-header">
-    <div class="brand">
-      <div class="brand__mark">TTM</div>
-      <div class="brand__text">
-        <strong>Task Team Manager</strong>
-        <small>Colabora, organiza y entrega</small>
-      </div>
-    </div>
-    <nav class="component-nav">
-      <button class="component-button component-button--ghost" id="theme-toggle" title="Cambiar tema">🌞 / 🌙</button>
-      <button class="component-button component-button--ghost utility-hidden" data-js="logout-btn">Salir</button>
-    </nav>
-  </header>
-
-  <main class="layout-main">
-   
-    <section class="component-panel auth-grid" data-js="auth-section">
-    
-      <div class="auth-grid__image auth-grid__image--left" aria-hidden="true"></div>
-      <div class="auth-grid__image auth-grid__image--right" aria-hidden="true"></div>
-    </section>
-
-  
-    <section class="component-panel utility-hidden" data-js="tasks-section">
-      <div class="component-panel__title-row">
-        <h2 class="component-panel__title">Tablero de tareas</h2>
-        <div class="board-actions">
-          <form class="board-add" data-js="board-add-form">
-            <input class="component-form__input" name="title" placeholder="Nueva tarea..." required />
-            <select class="component-form__input" name="column">
-              <option value="backlog">Backlog</option>
-              <option value="inprogress">En progreso</option>
-              <option value="done">Hecho</option>
-            </select>
-            <button class="component-button" type="submit">Agregar</button>
-          </form>
+    <link rel="stylesheet" href="../src/assets/style.css" />
+  </head>
+  <body>
+    <header class="layout-header">
+      <div class="brand">
+        <div class="brand__mark">TTM</div>
+        <div class="brand__text">
+          <strong>Task Team Manager</strong>
+          <small>Colabora, organiza y entrega</small>
         </div>
       </div>
-      <div class="board">
-        <div class="board__col" data-col="backlog">
-          <h3 class="board__title">Backlog</h3>
-          <div class="board__list" data-js="col-backlog"></div>
+      <nav class="component-nav">
+        <button
+          class="component-button component-button--ghost"
+          id="theme-toggle"
+          title="Cambiar tema"
+        >
+          🌞 / 🌙
+        </button>
+        <button
+          class="component-button component-button--ghost utility-hidden"
+          data-js="logout-btn"
+        >
+          Salir
+        </button>
+      </nav>
+    </header>
+
+    <main class="layout-main">
+      <section class="component-panel auth-grid" data-js="auth-section">
+        <div
+          class="auth-grid__image auth-grid__image--left"
+          aria-hidden="true"
+        ></div>
+        <div
+          class="auth-grid__image auth-grid__image--right"
+          aria-hidden="true"
+        ></div>
+      </section>
+
+      <section class="component-panel utility-hidden" data-js="tasks-section">
+        <div class="component-panel__title-row">
+          <h2 class="component-panel__title">Tablero de tareas</h2>
+          <div class="board-actions">
+            <form class="board-add" data-js="board-add-form">
+              <input
+                class="component-form__input"
+                name="title"
+                placeholder="Nueva tarea..."
+                required
+              />
+              <select class="component-form__input" name="column">
+                <option value="backlog">Backlog</option>
+                <option value="inprogress">En progreso</option>
+                <option value="done">Hecho</option>
+              </select>
+              <button class="component-button" type="submit">Agregar</button>
+            </form>
+          </div>
         </div>
-        <div class="board__col" data-col="inprogress">
-          <h3 class="board__title">En progreso</h3>
-          <div class="board__list" data-js="col-inprogress"></div>
+        <div class="board">
+          <div class="board__col" data-col="backlog">
+            <h3 class="board__title">Backlog</h3>
+            <div class="board__list" data-js="col-backlog"></div>
+          </div>
+          <div class="board__col" data-col="inprogress">
+            <h3 class="board__title">En progreso</h3>
+            <div class="board__list" data-js="col-inprogress"></div>
+          </div>
+          <div class="board__col" data-col="done">
+            <h3 class="board__title">Hecho</h3>
+            <div class="board__list" data-js="col-done"></div>
+          </div>
         </div>
-        <div class="board__col" data-col="done">
-          <h3 class="board__title">Hecho</h3>
-          <div class="board__list" data-js="col-done"></div>
+      </section>
+
+      <section
+        id="modalOverlay"
+        class="component-modal-overlay component-modal-overlay--hidden"
+        data-js="modal-overlay"
+      ></section>
+
+      <section class="component-panel utility-hidden" data-js="stats-section">
+        <h2 class="component-panel__title">Estadísticas</h2>
+        <p class="utility-muted">
+          Próximamente: gráficos de avance, rendimiento del equipo y más.
+        </p>
+        <div class="stats-grid">
+          <div
+            class="stats-card stats-card--img charts-a"
+            aria-hidden="true"
+          ></div>
+          <div
+            class="stats-card stats-card--img charts-b"
+            aria-hidden="true"
+          ></div>
+          <div
+            class="stats-card stats-card--img charts-c"
+            aria-hidden="true"
+          ></div>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
+    <footer class="layout-footer utility-text-center">
+      <small
+        >© 2025 Task Team Manager <br />
+        Grupo 1
+      </small>
+    </footer>
 
-    <section class="component-panel utility-hidden" data-js="stats-section">
-      <h2 class="component-panel__title">Estadísticas</h2>
-      <p class="utility-muted">Próximamente: gráficos de avance, rendimiento del equipo y más.</p>
-      <div class="stats-grid">
-        <div class="stats-card stats-card--img charts-a" aria-hidden="true"></div>
-        <div class="stats-card stats-card--img charts-b" aria-hidden="true"></div>
-        <div class="stats-card stats-card--img charts-c" aria-hidden="true"></div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="layout-footer utility-text-center">
-    <small>© 2025 Task Team Manager <br> Grupo 1 </small>
-  </footer>
-
-  <script src="../js/login.js"></script>
-</body>
+    <script src="../js/login.js"></script>
+    <script src="../js/crudTareas.js"></script>
+  </body>
 </html>

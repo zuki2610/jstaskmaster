@@ -2,22 +2,37 @@ const EventBus = (() => {
   const listeners = new Map();
   return {
     on(eventName, handler) {
-      (listeners.get(eventName) ?? listeners.set(eventName, new Set()).get(eventName)).add(handler);
+      (
+        listeners.get(eventName) ??
+        listeners.set(eventName, new Set()).get(eventName)
+      ).add(handler);
     },
-    off(eventName, handler) { listeners.get(eventName)?.delete(handler); },
-    emit(eventName, payload) { listeners.get(eventName)?.forEach(h => h(payload)); },
+    off(eventName, handler) {
+      listeners.get(eventName)?.delete(handler);
+    },
+    emit(eventName, payload) {
+      listeners.get(eventName)?.forEach((h) => h(payload));
+    },
   };
 })();
 const Storage = {
   get(key, fallback = null) {
-    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-    catch { return fallback; }
+    try {
+      return JSON.parse(localStorage.getItem(key)) ?? fallback;
+    } catch {
+      return fallback;
+    }
   },
-  set(key, value) { localStorage.setItem(key, JSON.stringify(value)); },
-  patch(key, updater) { this.set(key, updater(this.get(key))); },
-  remove(key) { localStorage.removeItem(key); },
+  set(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  },
+  patch(key, updater) {
+    this.set(key, updater(this.get(key)));
+  },
+  remove(key) {
+    localStorage.removeItem(key);
+  },
 };
-
 
 class User {
   constructor({ id, name, email, passwordHash, loggedIn = false }) {
@@ -34,23 +49,24 @@ const SESSION_KEY = "ttm:session";
 const TASKS_KEY = "ttm:tasks";
 const THEME_KEY = "ttm:theme";
 
-
-function applyTheme(theme){
+function applyTheme(theme) {
   const html = document.documentElement;
   html.setAttribute("data-theme", theme);
   Storage.set(THEME_KEY, theme);
 }
-function initTheme(){
+function initTheme() {
   const saved = Storage.get(THEME_KEY, "light");
   applyTheme(saved);
   document.getElementById("theme-toggle")?.addEventListener("click", () => {
-    const next = (document.documentElement.getAttribute("data-theme") === "light") ? "dark" : "light";
+    const next =
+      document.documentElement.getAttribute("data-theme") === "light"
+        ? "dark"
+        : "light";
     applyTheme(next);
   });
 }
 
-
-function mountAuth(rootEl){
+function mountAuth(rootEl) {
   ensureSeeds();
   EventBus.on("app:session_check", () => render(rootEl));
   EventBus.on("ui:logout", handleLogout);
@@ -80,52 +96,72 @@ function mountAuth(rootEl){
   });
 }
 
-function hash(s){
-  let h = 0; for (let i=0;i<s.length;i++){ h = ((h<<5)-h)+s.charCodeAt(i); h|=0; }
+function hash(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h << 5) - h + s.charCodeAt(i);
+    h |= 0;
+  }
   return `${h}`;
 }
 
-function ensureSeeds(){
+function ensureSeeds() {
   if (!Storage.get(USERS_KEY)) Storage.set(USERS_KEY, []);
   if (!Storage.get(TASKS_KEY)) Storage.set(TASKS_KEY, []);
 }
 
-function currentSession(){ return Storage.get(SESSION_KEY, null); }
-function setSession(userId){ Storage.set(SESSION_KEY, { userId }); }
-function clearSession(){ Storage.remove(SESSION_KEY); }
+function currentSession() {
+  return Storage.get(SESSION_KEY, null);
+}
+function setSession(userId) {
+  Storage.set(SESSION_KEY, { userId });
+}
+function clearSession() {
+  Storage.remove(SESSION_KEY);
+}
 
-function handleLogout(){
+function handleLogout() {
   const session = currentSession();
-  if (session){
+  if (session) {
     const users = Storage.get(USERS_KEY, []);
-    const idx = users.findIndex(u => u.id === session.userId);
-    if (idx >= 0){ users[idx].loggedIn = false; Storage.set(USERS_KEY, users); }
+    const idx = users.findIndex((u) => u.id === session.userId);
+    if (idx >= 0) {
+      users[idx].loggedIn = false;
+      Storage.set(USERS_KEY, users);
+    }
   }
   clearSession();
   EventBus.emit("app:user_logged_out");
   EventBus.emit("app:session_check");
 }
 
-function handleLogin(fd, rootEl){
+function handleLogin(fd, rootEl) {
   ensureSeeds();
   const email = (fd.get("email") || "").trim().toLowerCase();
   const password = fd.get("password") || "";
   const errors = {};
 
-  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.email = "Correo inválido.";
-  if (!password || password.length < 6) errors.password = "Mínimo 6 caracteres.";
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
+    errors.email = "Correo inválido.";
+  if (!password || password.length < 6)
+    errors.password = "Mínimo 6 caracteres.";
 
-  if (Object.keys(errors).length){
+  if (Object.keys(errors).length) {
     return showLogin(rootEl, { errors, values: { email } });
   }
 
   const users = Storage.get(USERS_KEY, []);
-  const user = users.find(u => u.email === email && u.passwordHash === hash(password));
-  if (!user){
-    return showLogin(rootEl, { errors: { general: "Credenciales inválidas." }, values: { email } });
+  const user = users.find(
+    (u) => u.email === email && u.passwordHash === hash(password)
+  );
+  if (!user) {
+    return showLogin(rootEl, {
+      errors: { general: "Credenciales inválidas." },
+      values: { email },
+    });
   }
 
-  users.forEach(u => u.loggedIn = false);
+  users.forEach((u) => (u.loggedIn = false));
   user.loggedIn = true;
   Storage.set(USERS_KEY, users);
   setSession(user.id);
@@ -135,23 +171,27 @@ function handleLogin(fd, rootEl){
   showAppSections();
 }
 
-function handleRegister(fd, rootEl){
+function handleRegister(fd, rootEl) {
   ensureSeeds();
-  const name = (fd.get("name")||"").trim();
-  const email = (fd.get("email")||"").trim().toLowerCase();
-  const password = fd.get("password")||"";
-  const password2 = fd.get("password2")||"";
+  const name = (fd.get("name") || "").trim();
+  const email = (fd.get("email") || "").trim().toLowerCase();
+  const password = fd.get("password") || "";
+  const password2 = fd.get("password2") || "";
   const errors = {};
 
   if (!name) errors.name = "Nombre requerido.";
-  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.email = "Correo inválido.";
-  if (!password || password.length < 6) errors.password = "Mínimo 6 caracteres.";
-  if (password !== password2) errors.password2 = "Las contraseñas no coinciden.";
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
+    errors.email = "Correo inválido.";
+  if (!password || password.length < 6)
+    errors.password = "Mínimo 6 caracteres.";
+  if (password !== password2)
+    errors.password2 = "Las contraseñas no coinciden.";
 
   const users = Storage.get(USERS_KEY, []);
-  if (users.some(u => u.email === email)) errors.email = "El correo ya está registrado.";
+  if (users.some((u) => u.email === email))
+    errors.email = "El correo ya está registrado.";
 
-  if (Object.keys(errors).length){
+  if (Object.keys(errors).length) {
     return showRegister(rootEl, { errors, values: { name, email } });
   }
 
@@ -162,7 +202,7 @@ function handleRegister(fd, rootEl){
     passwordHash: hash(password),
     loggedIn: true,
   });
-  users.forEach(u => u.loggedIn = false);
+  users.forEach((u) => (u.loggedIn = false));
   Storage.set(USERS_KEY, [...users, newUser]);
   setSession(newUser.id);
 
@@ -171,22 +211,36 @@ function handleRegister(fd, rootEl){
   showAppSections();
 }
 
-function showLogin(rootEl, state = {}){
+function showLogin(rootEl, state = {}) {
   const { errors = {}, values = {} } = state;
   rootEl.innerHTML = `
     <div class="auth-box">
       <h2 class="component-panel__title">Iniciar sesión</h2>
-      ${errors.general ? `<p class="component-form__error utility-margin-top-4">${errors.general}</p>` : ""}
+      ${
+        errors.general
+          ? `<p class="component-form__error utility-margin-top-4">${errors.general}</p>`
+          : ""
+      }
       <form class="component-form utility-margin-top-4" data-js="login-form" novalidate>
         <div class="component-form__row">
           <label class="component-form__label" for="email">Correo</label>
-          <input class="component-form__input" type="email" id="email" name="email" placeholder="tu@email.com" value="${values.email ?? ""}" required />
-          ${errors.email ? `<small class="component-form__error">${errors.email}</small>` : ""}
+          <input class="component-form__input" type="email" id="email" name="email" placeholder="tu@email.com" value="${
+            values.email ?? ""
+          }" required />
+          ${
+            errors.email
+              ? `<small class="component-form__error">${errors.email}</small>`
+              : ""
+          }
         </div>
         <div class="component-form__row">
           <label class="component-form__label" for="password">Contraseña</label>
           <input class="component-form__input" type="password" id="password" name="password" placeholder="••••••••" required minlength="6" />
-          ${errors.password ? `<small class="component-form__error">${errors.password}</small>` : ""}
+          ${
+            errors.password
+              ? `<small class="component-form__error">${errors.password}</small>`
+              : ""
+          }
         </div>
         <div class="component-form__row utility-flex utility-gap-4">
           <button class="component-button" type="submit">Entrar</button>
@@ -198,7 +252,7 @@ function showLogin(rootEl, state = {}){
   updateNavVisibility();
 }
 
-function showRegister(rootEl, state = {}){
+function showRegister(rootEl, state = {}) {
   const { errors = {}, values = {} } = state;
   rootEl.innerHTML = `
     <div class="auth-box">
@@ -206,23 +260,43 @@ function showRegister(rootEl, state = {}){
       <form class="component-form utility-margin-top-4" data-js="register-form" novalidate>
         <div class="component-form__row">
           <label class="component-form__label" for="name">Nombre</label>
-          <input class="component-form__input" type="text" id="name" name="name" placeholder="Ana Pérez" value="${values.name ?? ""}" required />
-          ${errors.name ? `<small class="component-form__error">${errors.name}</small>` : ""}
+          <input class="component-form__input" type="text" id="name" name="name" placeholder="Ana Pérez" value="${
+            values.name ?? ""
+          }" required />
+          ${
+            errors.name
+              ? `<small class="component-form__error">${errors.name}</small>`
+              : ""
+          }
         </div>
         <div class="component-form__row">
           <label class="component-form__label" for="email">Correo</label>
-          <input class="component-form__input" type="email" id="email" name="email" placeholder="ana@example.com" value="${values.email ?? ""}" required />
-          ${errors.email ? `<small class="component-form__error">${errors.email}</small>` : ""}
+          <input class="component-form__input" type="email" id="email" name="email" placeholder="ana@example.com" value="${
+            values.email ?? ""
+          }" required />
+          ${
+            errors.email
+              ? `<small class="component-form__error">${errors.email}</small>`
+              : ""
+          }
         </div>
         <div class="component-form__row">
           <label class="component-form__label" for="password">Contraseña</label>
           <input class="component-form__input" type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6" />
-          ${errors.password ? `<small class="component-form__error">${errors.password}</small>` : ""}
+          ${
+            errors.password
+              ? `<small class="component-form__error">${errors.password}</small>`
+              : ""
+          }
         </div>
         <div class="component-form__row">
           <label class="component-form__label" for="password2">Repite la contraseña</label>
           <input class="component-form__input" type="password" id="password2" name="password2" placeholder="Repite tu contraseña" required minlength="6" />
-          ${errors.password2 ? `<small class="component-form__error">${errors.password2}</small>` : ""}
+          ${
+            errors.password2
+              ? `<small class="component-form__error">${errors.password2}</small>`
+              : ""
+          }
         </div>
         <div class="component-form__row utility-flex utility-gap-4">
           <button class="component-button" type="submit">Crear cuenta</button>
@@ -234,16 +308,16 @@ function showRegister(rootEl, state = {}){
   updateNavVisibility();
 }
 
-function render(rootEl){
+function render(rootEl) {
   const session = currentSession();
-  if (!session){
+  if (!session) {
     showLogin(rootEl);
     hideAppSections();
     return;
   }
   const users = Storage.get(USERS_KEY, []);
-  const me = users.find(u => u.id === session.userId);
-  if (!me){
+  const me = users.find((u) => u.id === session.userId);
+  if (!me) {
     showLogin(rootEl);
     hideAppSections();
     return;
@@ -259,35 +333,43 @@ function render(rootEl){
       </div>
     </div>
   `;
-  document.querySelector('[data-js="auth-section"]').addEventListener("click", (e) => {
-    if (e.target.matches('[data-js="go-tasks"]')){
-      e.preventDefault();
-      showAppSections();
-    }
-    if (e.target.matches('[data-js="do-logout"]')){
-      e.preventDefault();
-      EventBus.emit("ui:logout");
-      showLogin(rootEl);
-    }
-  });
+  document
+    .querySelector('[data-js="auth-section"]')
+    .addEventListener("click", (e) => {
+      if (e.target.matches('[data-js="go-tasks"]')) {
+        e.preventDefault();
+        showAppSections();
+      }
+      if (e.target.matches('[data-js="do-logout"]')) {
+        e.preventDefault();
+        EventBus.emit("ui:logout");
+        showLogin(rootEl);
+      }
+    });
   updateNavVisibility(true);
 }
 
-
-function hideAppSections(){
-  document.querySelector('[data-js="tasks-section"]').classList.add("utility-hidden");
-  document.querySelector('[data-js="stats-section"]').classList.add("utility-hidden");
+function hideAppSections() {
+  document
+    .querySelector('[data-js="tasks-section"]')
+    .classList.add("utility-hidden");
+  document
+    .querySelector('[data-js="stats-section"]')
+    .classList.add("utility-hidden");
 }
-function showAppSections(){
-  document.querySelector('[data-js="tasks-section"]').classList.remove("utility-hidden");
-  document.querySelector('[data-js="stats-section"]').classList.remove("utility-hidden");
+function showAppSections() {
+  document
+    .querySelector('[data-js="tasks-section"]')
+    .classList.remove("utility-hidden");
+  document
+    .querySelector('[data-js="stats-section"]')
+    .classList.remove("utility-hidden");
 }
 
-
-function updateNavVisibility(isLogged = !!Storage.get(SESSION_KEY)){
+function updateNavVisibility(isLogged = !!Storage.get(SESSION_KEY)) {
   const logoutBtn = document.querySelector('[data-js="logout-btn"]');
   if (!logoutBtn) return;
-  if (isLogged){
+  if (isLogged) {
     logoutBtn.classList.remove("utility-hidden");
     logoutBtn.onclick = () => EventBus.emit("ui:logout");
   } else {
@@ -295,20 +377,23 @@ function updateNavVisibility(isLogged = !!Storage.get(SESSION_KEY)){
     logoutBtn.onclick = null;
   }
 }
-function qs(sel){ return document.querySelector(sel); }
+function qs(sel) {
+  return document.querySelector(sel);
+}
 
-
-function renderBoard(){
+function renderBoard() {
   const tasks = Storage.get(TASKS_KEY, []);
   const cols = {
     backlog: qs('[data-js="col-backlog"]'),
     inprogress: qs('[data-js="col-inprogress"]'),
     done: qs('[data-js="col-done"]'),
   };
-  Object.values(cols).forEach(el => el && (el.innerHTML = ""));
-  for (const t of tasks){
+  Object.values(cols).forEach((el) => el && (el.innerHTML = ""));
+  for (const t of tasks) {
     const el = document.createElement("div");
     el.className = "card";
+    el.setAttribute("data-js", "task-card");
+    el.onclick = () => renderEditTask(t);
     el.innerHTML = `
       <span class="card__title">${escapeHtml(t.title)}</span>
       <span class="card__actions">
@@ -320,53 +405,222 @@ function renderBoard(){
   }
 }
 
-function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+function escapeHtml(s) {
+  return s.replace(
+    /[&<>"']/g,
+    (m) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[
+        m
+      ])
+  );
+}
 
-function initBoard(){
+function renderEditTask(task) {
+  const el = document.querySelector('[data-js="modal-overlay"]');
+  el.classList.remove("component-modal-overlay--hidden");
+  el.innerHTML = `
+        <div
+          class="component-modal"
+          role="dialog"
+          aria-labelledby="modal-title"
+          aria-modal="true"
+          data-js="modal"
+        >
+          <div class="component-modal__header">
+            <h2 id="modal-title" class="component-modal__title">
+              Editar Tarea
+            </h2>
+            <button
+              class="component-modal__close-button"
+              data-js="close-modal"
+              aria-label="Close modal"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="component-modal__content">
+            <form id="taskForm" data-js="task-form">
+              <div class="component-form__group">
+                <label for="taskTitle" class="component-form__label"
+                  >Título</label
+                >
+                <input
+                  type="text"
+                  id="taskTitle"
+                  class="component-form__input"
+                  value="${task.title}"
+                  placeholder="Ingresa un Título para la tarea"
+                  data-js="task-title"
+                />
+              </div>
+
+              <div class="component-form__group">
+                <label for="taskDescription" class="component-form__label"
+                  >Descripción</label
+                >
+                <textarea
+                  id="taskDescription"
+                  class="component-form__textarea"
+                  placeholder="Describe la tarea..."
+                  data-js="task-description"
+                  value=""
+                >${task.description}</textarea>
+              </div>
+
+              <div class="component-form__group">
+                <label for="assignedUser" class="component-form__label"
+                  >Asignar miembro</label
+                >
+                <select
+                  id="assignedUser"
+                  class="component-form__select"
+                  data-js="assigned-user"
+                >
+                  <option value="">Select user</option>
+                  <option value="john-doe" selected>task</option>
+                  <option value="jane-smith">Jane Smith</option>
+                  <option value="mike-johnson">Mike Johnson</option>
+                  <option value="sarah-wilson">Sarah Wilson</option>
+                </select>
+              </div>
+
+              <div class="component-form__group">
+                <label for="processStage" class="component-form__label"
+                  >Estado</label
+                >
+                <select
+                  id="processStage"
+                  class="component-form__select"
+                  data-js="process-stage"
+                >
+                  <option value="backlog" selected>Backlog</option>
+                  <option value="inprogress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+            </form>
+          </div>
+
+          <div class="component-modal__footer">
+            <button
+              type="button"
+              class="component-button component-button--secondary"
+              data-js="cancel-task"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="component-button component-button--primary"
+              data-js="save-task"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      
+    `;
+  document
+    .querySelector('[data-js="save-task"]')
+    .addEventListener("click", () => {
+      const updatedTask = {
+        id: task.id,
+        title: document.querySelector('[data-js="task-title"]').value,
+        description: document.querySelector('[data-js="task-description"]')
+          .value,
+        assignee: document.querySelector('[data-js="assigned-user"]').value,
+        column: document.querySelector('[data-js="process-stage"]').value,
+      };
+      localStorage.setItem(
+        `task-${updatedTask.id}`,
+        JSON.stringify(updatedTask)
+      );
+      document
+        .querySelector('[data-js="modal-overlay"]')
+        .classList.add("component-modal-overlay--hidden");
+    });
+
+  document
+    .querySelector('[data-js="close-modal"]')
+    .addEventListener("click", () => {
+      document
+        .querySelector('[data-js="modal-overlay"]')
+        .classList.add("component-modal-overlay--hidden");
+    });
+
+  console.log(task);
+}
+
+function initBoard() {
   const form = document.querySelector('[data-js="board-add-form"]');
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const fd = new FormData(form);
     const title = (fd.get("title") || "").toString().trim();
     const column = (fd.get("column") || "backlog").toString();
+
     if (!title) return;
     const tasks = Storage.get(TASKS_KEY, []);
-    tasks.push({ id: `t_${Date.now()}`, title, column });
+    tasks.push({
+      id: `t_${Date.now()}`,
+      title,
+      column,
+      description: "",
+      asignee: "",
+    });
     Storage.set(TASKS_KEY, tasks);
     form.reset();
     renderBoard();
+    console.log("initBoard");
   });
 
-  document.querySelector('[data-js="tasks-section"]').addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
-    if (btn.matches('[data-js="delete"]')){
-      const id = btn.getAttribute("data-id");
-      Storage.set(TASKS_KEY, Storage.get(TASKS_KEY, []).filter(t => t.id !== id));
-      renderBoard();
-    }
-    if (btn.matches('[data-js="move"]')){
-      const id = btn.getAttribute("data-id");
-      const tasks = Storage.get(TASKS_KEY, []);
-      const idx = tasks.findIndex(t => t.id === id);
-      if (idx >= 0){
-        const order = ["backlog","inprogress","done"];
-        const next = order[(order.indexOf(tasks[idx].column)+1)%order.length];
-        tasks[idx].column = next;
-        Storage.set(TASKS_KEY, tasks);
+  document
+    .querySelector('[data-js="tasks-section"]')
+    .addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      if (btn.matches('[data-js="delete"]')) {
+        const id = btn.getAttribute("data-id");
+        Storage.set(
+          TASKS_KEY,
+          Storage.get(TASKS_KEY, []).filter((t) => t.id !== id)
+        );
         renderBoard();
       }
-    }
-  });
+      if (btn.matches('[data-js="move"]')) {
+        const id = btn.getAttribute("data-id");
+        const tasks = Storage.get(TASKS_KEY, []);
+        const idx = tasks.findIndex((t) => t.id === id);
+        if (idx >= 0) {
+          const order = ["backlog", "inprogress", "done"];
+          const next =
+            order[(order.indexOf(tasks[idx].column) + 1) % order.length];
+          tasks[idx].column = next;
+          Storage.set(TASKS_KEY, tasks);
+          renderBoard();
+        }
+      }
+    });
 
   renderBoard();
 }
-
 
 const authRoot = qs('[data-js="auth-section"]');
 initTheme();
 mountAuth(authRoot);
 initBoard();
+// renderEditTask();
 
 EventBus.on("app:user_logged_in", ({ user }) => {
   console.log("Usuario logueado:", user.email);
