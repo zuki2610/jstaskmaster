@@ -1,0 +1,177 @@
+@import "./style.css";
+
+.component-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlay-hard);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.component-modal-overlay--hidden {
+  display: none;
+}
+
+.component-modal {
+  background-color: rgb(var(--bg));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.component-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6);
+  border-bottom: 1px solid rgb(var(--border));
+  background-color: rgb(var(--panel));
+}
+
+.component-modal__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+}
+
+.component-modal__close-button {
+  background: none;
+  border: none;
+  padding: var(--space-2);
+  cursor: pointer;
+  border-radius: 6px;
+  color: rgb(var(--muted));
+  transition: all 0.2s;
+}
+
+.component-modal__close-button:hover {
+  background-color: rgb(var(--border));
+  color: rgb(var(--text));
+}
+
+.component-modal__content {
+  padding: var(--space-6);
+  flex: 1;
+  overflow-y: auto;
+}
+
+.component-modal__footer {
+  padding: var(--space-6);
+  border-top: 1px solid rgb(var(--border));
+  background-color: rgb(var(--panel));
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+.component-form__group {
+  margin-bottom: var(--space-6);
+}
+
+.component-form__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(var(--text));
+  margin-bottom: var(--space-2);
+}
+
+.component-form__input,
+.component-form__textarea,
+.component-form__select {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid rgb(var(--border));
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: rgb(var(--text));
+  background-color: rgb(var(--bg));
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.component-form__input:focus,
+.component-form__textarea:focus,
+.component-form__select:focus {
+  outline: none;
+  border-color: rgb(var(--c-primary));
+  box-shadow: 0 0 0 3px rgba(var(--c-primary), 0.1);
+}
+
+.component-form__textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.component-form__checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.component-form__checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: rgb(var(--c-primary));
+}
+
+.component-form__checkbox-label {
+  font-size: 0.875rem;
+  color: rgb(var(--text));
+  cursor: pointer;
+}
+
+.component-button {
+  padding: var(--space-3) var(--space-4);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.component-button--secondary {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--text));
+  border: 1px solid rgb(var(--border));
+}
+
+.component-button--secondary:hover {
+  background-color: rgb(var(--panel));
+}
+
+.component-button--primary {
+  background-color: rgb(var(--c-primary));
+  color: white;
+}
+
+.component-button--primary:hover {
+  background-color: rgba(var(--c-primary), 0.9);
+}
+
+.component-button--demo {
+  background-color: rgb(var(--c-primary));
+  color: white;
+  padding: var(--space-4) var(--space-6);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.component-button--demo:hover {
+  background-color: rgba(var(--c-primary), 0.9);
+}
+
+.utility-hidden {
+  display: none;
+}
