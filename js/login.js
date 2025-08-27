@@ -518,7 +518,7 @@ function initBoard() {
 
   setTimeout(() => {
     renderBoard();
-  }, 100);
+  }, 800);
 }
 
 const authRoot = qs('[data-js="auth-section"]');
@@ -526,7 +526,7 @@ initTheme();
 mountAuth(authRoot);
 setTimeout(() => {
   initBoard();
-}, 100);
+}, 800);
 
 EventBus.on("app:user_logged_in", ({ user }) => {
   console.log("Usuario logueado:", user.email);

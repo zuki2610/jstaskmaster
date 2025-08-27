@@ -457,6 +457,24 @@ body {
   }
 }
 
+@media (max-width: 540px) {
+  .component-panel__title-row {
+    display: block;
+  }
+
+  .board-actions {
+    display: block;
+  }
+
+  .board-add {
+    display: block;
+  }
+
+  .component-form__input {
+    margin-bottom: 16px;
+  }
+}
+
 /* Centrar el panel de login horizontal y verticalmente */
 .auth-grid[data-js="auth-section"] {
   width: 100%;
