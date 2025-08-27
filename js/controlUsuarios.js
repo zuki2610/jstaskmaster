@@ -15,20 +15,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let editUserId = null;
 
-  // Mostrar panel de usuarios
+  
   usersBtn.addEventListener("click", () => {
     tasksSection.classList.add("utility-hidden");
     usersSection.classList.remove("utility-hidden");
     renderUsers();
   });
 
-  // Volver a tareas
+ 
   backToTasksBtn.addEventListener("click", () => {
     usersSection.classList.add("utility-hidden");
     tasksSection.classList.remove("utility-hidden");
   });
 
-  // Guardar/editar usuario
+ 
   userForm.addEventListener("submit", (e) => {
     e.preventDefault();
     let name = userForm.name.value.trim();
@@ -50,16 +50,16 @@ document.addEventListener("DOMContentLoaded", () => {
     renderUsers();
   });
 
-  // Buscar y ordenar usuarios
+ 
   searchInput.addEventListener("input", renderUsers);
   sortSelect.addEventListener("change", renderUsers);
 
-  // Renderizar usuarios
+
   function renderUsers() {
     let users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
     const tasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || [];
 
-    // Filtrar por búsqueda
+    
     const searchTerm = searchInput.value.toLowerCase();
     if (searchTerm) {
       users = users.filter(u =>
@@ -68,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    // Ordenar
     const sortVal = sortSelect.value;
     if (sortVal) {
       switch (sortVal) {
@@ -109,7 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
 
-      // Editar
       card.querySelector(".user-card__btn--edit").addEventListener("click", () => {
         userForm.name.value = user.name;
         userForm.email.value = user.email;
@@ -120,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("user-name").focus();
       });
 
-      // Eliminar
+      
       card.querySelector(".user-card__btn--delete").addEventListener("click", () => {
         if(!confirm(`¿Eliminar a ${user.name}?`)) return;
         const updatedUsers = JSON.parse(localStorage.getItem(USERS_KEY)).filter(u=>u.id!==user.id);
@@ -128,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderUsers();
       });
 
-      // Cambiar estado
+     
       card.querySelector('[data-js="toggle-active"]').addEventListener("click", () => {
         user.activo = !user.activo;
         const usersData = JSON.parse(localStorage.getItem(USERS_KEY));
