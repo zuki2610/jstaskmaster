@@ -38,29 +38,24 @@
         >
           Salir
         </button>
+        <button
+          class="component-button component-button--ghost"
+          data-js="users-btn"
+        >
+          Usuarios
+        </button>
       </nav>
     </header>
 
     <main class="layout-main">
-      <section
-        class="component-panel section-header auth-grid"
-        data-js="auth-section"
-      >
-        <div
-          class="auth-grid__image auth-grid__image--left"
-          aria-hidden="true"
-        ></div>
-        <div
-          class="auth-grid__image auth-grid__image--right"
-          aria-hidden="true"
-        ></div>
+      <!-- Sección de login -->
+      <section class="component-panel section-header auth-grid" data-js="auth-section">
+        <div class="auth-grid__image auth-grid__image--left" aria-hidden="true"></div>
+        <div class="auth-grid__image auth-grid__image--right" aria-hidden="true"></div>
       </section>
 
-      <section
-        class="component-panel utility-hidden"
-        data-js="tasks-section"
-        id="tasks-board"
-      >
+      <!-- Sección de tareas -->
+      <section class="component-panel utility-hidden" data-js="tasks-section" id="tasks-board">
         <div class="component-panel__title-row">
           <h2 class="component-panel__title">Tablero de tareas</h2>
           <div class="board-actions">
@@ -96,12 +91,59 @@
         </div>
       </section>
 
-      <section
-        id="modalOverlay"
-        class="component-modal-overlay component-modal-overlay--hidden"
-        data-js="modal-overlay"
-      ></section>
+      <!-- Gestión de usuarios -->
+      <!-- Gestion de usuarios -->
+<section class="component-panel utility-hidden" data-js="users-section">
+  <h2 class="component-panel__title">Gestión de Usuarios</h2>
 
+  <!-- Formulario de agregar/editar usuario -->
+  <form class="component-form" data-js="user-form">
+    <div class="component-form__row">
+      <label class="component-form__label" for="user-name">Nombre</label>
+      <input class="component-form__input" type="text" name="name" id="user-name" required />
+    </div>
+    <div class="component-form__row">
+      <label class="component-form__label" for="user-email">Email</label>
+      <input class="component-form__input" type="email" name="email" id="user-email" required />
+    </div>
+    <div class="component-form__row">
+      <label class="component-form__label" for="user-role">Rol</label>
+      <select class="component-form__input" name="role" id="user-role">
+        <option value="Usuario">Usuario</option>
+        <option value="Administrador">Administrador</option>
+      </select>
+      <input type="text" placeholder="Agregar rol nuevo" data-js="new-role" class="component-form__input"/>
+    </div>
+    <button class="component-button component-button--primary" type="submit" data-js="save-user-btn">
+      Guardar usuario
+    </button>
+  </form>
+
+  <!-- Controles de búsqueda y orden -->
+  <div class="user-controls">
+    <input type="text" placeholder="Buscar usuario..." data-js="search-user" class="component-form__input"/>
+    <select data-js="sort-user" class="component-form__input">
+      <option value="">-- Ordenar --</option>
+      <option value="name-asc">Nombre A-Z</option>
+      <option value="name-desc">Nombre Z-A</option>
+      <option value="role">Por rol</option>
+      <option value="tasks">Cantidad de tareas</option>
+    </select>
+  </div>
+
+  <!-- Contenedor de cards de usuarios -->
+  <div class="users__list" data-js="users-list"></div>
+
+  <button class="component-button" data-js="back-to-tasks-btn">
+    Volver a Tareas
+  </button>
+</section>
+
+
+      <!-- Overlay para modales -->
+      <section id="modalOverlay" class="component-modal-overlay component-modal-overlay--hidden" data-js="modal-overlay"></section>
+
+      <!-- Sección de estadísticas -->
       <section class="component-panel utility-hidden" data-js="stats-section">
         <h2 class="component-panel__title">Estadísticas</h2>
         <p class="utility-muted">
@@ -122,15 +164,17 @@
     </main>
 
     <footer class="layout-footer utility-text-center">
-      <small
-        >© 2025 Task Team Manager <br />
+      <small>
+        © 2025 Task Team Manager <br />
         Grupo 1
       </small>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/login.js"></script>
     <script src="../js/crudTareas.js"></script>
     <script src="../js/christopher.js"></script>
+    <script src="../js/controlUsuarios.js"></script>
   </body>
 </html>
+
