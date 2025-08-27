@@ -412,7 +412,7 @@ function renderBoard() {
     el.innerHTML = `
       <span class="card__title">${escapeHtml(t.title)}</span>
       <span class="card__actions">
-        <button class="card__btn" data-js="move" data-id="${t.id}">➡</button>
+        <button class="card__btn" data-js="move" data-id="${t.id}">→</button>
         <button class="card__btn" data-js="delete" data-id="${t.id}">🗑</button>
       </span>
     `;

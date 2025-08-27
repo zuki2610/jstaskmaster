@@ -119,7 +119,7 @@ function renderEditTask(id) {
             </button>
             <button
               type="button"
-              class="component-button component-button--primary"
+              class="component-button"
               data-js="save-task"
             >
               Guardar Cambios

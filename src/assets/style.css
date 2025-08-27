@@ -36,7 +36,7 @@ textarea {
   --bg: 245, 236, 230;
   --panel: 244, 231, 223;
   --bg-column: 236, 203, 180;
-  --border: 228, 232, 240;
+  --border: 104, 77, 60;
   --text: 17, 24, 39;
   --muted: 107, 114, 128;
   --danger: 173, 7, 24;
@@ -48,18 +48,19 @@ textarea {
   --space-6: 1.5rem;
   --space-8: 2rem;
   --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.1);
-  --overlay-hard: rgba(0, 0, 0, 0.2);
+  --overlay-hard: rgba(0, 0, 0, 0.4);
 }
 
 /* === Color tokens (dark) — mezcla de azul con paleta del usuario === */
 html[data-theme="dark"] {
+  --c-primary: 201, 108, 8;
   --bg: 12, 18, 38; /* base azul profundo */
   --panel: 17, 24, 39;
   --bg-column: 12, 18, 38;
   --border: 36, 49, 77;
   --text: 229, 231, 235;
   --muted: 156, 163, 175;
-  --danger: 184, 35, 50;
+  --danger: 224, 45, 63;
   /* Colores del usuario se mantienen */
 }
 
@@ -203,7 +204,7 @@ body {
 .component-button {
   border: 1px solid transparent;
   background: var(--primary);
-  color: #fff;
+  color: rgb(var(--text));
   padding: 0.6rem 1rem;
   border-radius: 12px;
   font-weight: 700;
@@ -401,6 +402,7 @@ body {
 }
 .card__btn {
   background: transparent;
+  color: var(--text-color);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 0.25rem 0.5rem;
@@ -482,7 +484,6 @@ body {
   display: flex;
   justify-content: space-between;
   background-color: var(--panel-color);
-  border-bottom: 1px solid var(--border);
   transition: all 0.3s ease-in-out;
 }
 
