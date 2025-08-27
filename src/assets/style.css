@@ -424,12 +424,9 @@ body {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
+  gap: var(--space-3);
 }
-/* .stats-card{
-  height: 220px; border-radius: 16px;
-  border: 1px solid var(--border-color); box-shadow: var(--shadow-soft);
-} */
+
 .stats-card--img {
   background-size: cover;
   background-position: center;
@@ -443,9 +440,7 @@ body {
   .auth-grid__image {
     display: none;
   }
-  .board {
-    grid-template-columns: 1fr;
-  }
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
@@ -457,7 +452,11 @@ body {
   }
 }
 
-@media (max-width: 540px) {
+@media (max-width: 720px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+
   .component-panel__title-row {
     display: block;
   }
