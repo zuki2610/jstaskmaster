@@ -3,7 +3,8 @@ function renderEditTask(id) {
   const selectedTask = tasks.find((item) => item.id === id);
   console.log(selectedTask);
 
-  const USERS = ["john doe", "maria", "jose"];
+  // const USERS = ["john doe", "maria", "jose"];
+  const USERS = JSON.parse(localStorage.getItem("ttm:users") || "[]");
 
   const el = document.querySelector('[data-js="modal-overlay"]');
   el.classList.remove("component-modal-overlay--hidden");
@@ -78,9 +79,11 @@ function renderEditTask(id) {
                 >
                 <option value="">Select user</option>
                 ${USERS.map((user) => {
-                  return `<option value="${user}" ${
-                    selectedTask.asignado === user ? "selected" : ""
-                  }>${user}</option>`;
+                  return `<option value="${user.id}" ${
+                    String(selectedTask.asignado) === String(user.id)
+                      ? "selected"
+                      : ""
+                  }>${user.name}</option>`;
                 })}
           
                 </select>
@@ -187,6 +190,8 @@ function handleClickUpdateTask(task) {
   if (typeof renderBoard === "function") {
     renderBoard();
   }
+
+  if (typeof renderUsers === "function") renderUsers();
 }
 
 function handleCloseTaskModal() {
