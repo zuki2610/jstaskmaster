@@ -1,3 +1,7 @@
+/**
+ * Renders the modal for editing a task.
+ * @param {string} id - The ID of the task to edit.
+ */
 function renderEditTask(id) {
   const tasks = Storage.get(TASKS_KEY);
   const selectedTask = tasks.find((item) => item.id === id);
@@ -152,6 +156,10 @@ function renderEditTask(id) {
   });
 }
 
+/**
+ * Handles the click event to update a task.
+ * @param {Task} task - The task to update.
+ */
 function handleClickUpdateTask(task) {
   const updatedTask = {
     id: task.id,
@@ -194,6 +202,9 @@ function handleClickUpdateTask(task) {
   }
 }
 
+/**
+ * Handles closing the task modal.
+ */
 function handleCloseTaskModal() {
   document
     .querySelector('[data-js="close-modal"]')
@@ -204,6 +215,10 @@ function handleCloseTaskModal() {
     });
 }
 
+/**
+ * Renders the confirmation modal for deleting a task.
+ * @param {string} id - The ID of the task to delete.
+ */
 function renderDeleteConfirmation(id) {
   const el = document.querySelector('[data-js="modal-overlay"]');
   el.classList.remove("component-modal-overlay--hidden");

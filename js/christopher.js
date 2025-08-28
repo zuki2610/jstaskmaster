@@ -1,8 +1,19 @@
-//para cargar las tareas desde la api
-
+/**
+ * The key for storing tasks in localStorage.
+ * @type {string}
+ */
 const STORAGE_KEY = "ttm:tasks";
+
+/**
+ * The URL of the mock API for tasks.
+ * @type {string}
+ */
 const API_URL = "https://68a8eeb4b115e67576ea102a.mockapi.io/tareas";
 
+/**
+ * Loads initial tasks from a mock API if localStorage is empty.
+ * @returns {Promise<void>}
+ */
 async function cargarTareasIniciales() {
   let tareasLocal = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
@@ -33,13 +44,7 @@ async function cargarTareasIniciales() {
 
 cargarTareasIniciales();
 
-
-
-
-
-//aqui empiezan los graficos
-
-
+// Chart initialization
 EventBus.on("app:user_logged_in", () => {
   setTimeout(initStatsSection, 100);
 });
@@ -47,8 +52,10 @@ EventBus.on("stats:ready", () => {
   initStatsSection();
 });
 
-
 let estadoChartInstance = null;
+/**
+ * Updates the task status doughnut chart.
+ */
 function updateEstadoChart() {
   const tareas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
@@ -82,7 +89,6 @@ function updateEstadoChart() {
   });
 }
 
-
 let asignadoChartInstance = null;
 
 const PALETA_PERSONAS = [
@@ -94,6 +100,9 @@ const PALETA_PERSONAS = [
   "#332B24"
 ];
 
+/**
+ * Updates the task assignment doughnut chart.
+ */
 function updateAsignadoChart() {
   const tareas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
@@ -138,8 +147,10 @@ function updateAsignadoChart() {
   });
 }
 
-
 let notStatusChartInstance = null;
+/**
+ * Updates the task summary bar chart.
+ */
 function updateNotStatusChart() {
   const tareas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
@@ -190,7 +201,9 @@ function updateNotStatusChart() {
   });
 }
 
-
+/**
+ * Initializes all charts in the statistics section.
+ */
 function initStatsSection() {
   updateEstadoChart();
   updateAsignadoChart();

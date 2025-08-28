@@ -54,6 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
   searchInput.addEventListener("input", renderUsers);
   sortSelect.addEventListener("change", renderUsers);
 
+  /**
+   * Renders the list of users based on search and sort criteria.
+   */
   function renderUsers() {
     let users = JSON.parse(localStorage.getItem(USERS_KEY)) || [];
     const tasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || [];
@@ -156,6 +159,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /**
+   * Counts the number of tasks assigned to a user.
+   * @param {string} userId - The ID of the user.
+   * @returns {number} The number of tasks assigned to the user.
+   */
   function countTasks(userId) {
     const tasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || [];
     return tasks.filter((t) => String(t.asignado) === String(userId)).length;

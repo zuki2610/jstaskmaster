@@ -1,22 +1,68 @@
+/**
+ * @typedef {Object} User
+ * @property {string} id - The user's unique ID.
+ * @property {string} name - The user's name.
+ * @property {string} email - The user's email address.
+ * @property {string} passwordHash - The hashed password.
+ * @property {boolean} loggedIn - The user's login status.
+ */
+
+/**
+ * @typedef {Object} Task
+ * @property {string} id - The task's unique ID.
+ * @property {string} title - The title of the task.
+ * @property {string} column - The column the task is in (e.g., 'backlog', 'inprogress', 'done').
+ * @property {string} asignado - The ID of the user the task is assigned to.
+ * @property {string} descripcion - The description of the task.
+ */
+
+/**
+ * A simple event bus for pub/sub communication.
+ * @type {{on: (function(string, Function)), off: (function(string, Function)), emit: (function(string, any))}}
+ */
 const EventBus = (() => {
   const listeners = new Map();
   return {
+    /**
+     * Register an event handler.
+     * @param {string} eventName - The name of the event.
+     * @param {Function} handler - The function to call when the event is emitted.
+     */
     on(eventName, handler) {
       (
         listeners.get(eventName) ??
         listeners.set(eventName, new Set()).get(eventName)
       ).add(handler);
     },
+    /**
+     * Unregister an event handler.
+     * @param {string} eventName - The name of the event.
+     * @param {Function} handler - The handler to remove.
+     */
     off(eventName, handler) {
       listeners.get(eventName)?.delete(handler);
     },
+    /**
+     * Emit an event.
+     * @param {string} eventName - The name of the event.
+     * @param {*} [payload] - The data to pass to the handlers.
+     */
     emit(eventName, payload) {
       listeners.get(eventName)?.forEach((h) => h(payload));
     },
   };
 })();
 
+/**
+ * A wrapper for localStorage to handle JSON serialization.
+ */
 const Storage = {
+  /**
+   * Get a value from localStorage.
+   * @param {string} key - The key to retrieve.
+   * @param {*} [fallback=null] - The value to return if the key doesn't exist.
+   * @returns {*} The stored value or the fallback.
+   */
   get(key, fallback = null) {
     try {
       return JSON.parse(localStorage.getItem(key)) ?? fallback;
@@ -24,18 +70,43 @@ const Storage = {
       return fallback;
     }
   },
+  /**
+   * Set a value in localStorage.
+   * @param {string} key - The key to set.
+   * @param {*} value - The value to store.
+   */
   set(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
   },
+  /**
+   * Update a value in localStorage using an updater function.
+   * @param {string} key - The key to update.
+   * @param {Function} updater - A function that receives the old value and returns the new one.
+   */
   patch(key, updater) {
     this.set(key, updater(this.get(key)));
   },
+  /**
+   * Remove a value from localStorage.
+   * @param {string} key - The key to remove.
+   */
   remove(key) {
     localStorage.removeItem(key);
   },
 };
 
+/**
+ * Represents a user of the application.
+ */
 class User {
+  /**
+   * @param {object} props - The user properties.
+   * @param {string} props.id - The user's unique ID.
+   * @param {string} props.name - The user's name.
+   * @param {string} props.email - The user's email address.
+   * @param {string} props.passwordHash - The hashed password.
+   * @param {boolean} [props.loggedIn=false] - The user's login status.
+   */
   constructor({ id, name, email, passwordHash, loggedIn = false }) {
     this.id = id;
     this.name = name;
@@ -50,11 +121,19 @@ const SESSION_KEY = "ttm:session";
 const TASKS_KEY = "ttm:tasks";
 const THEME_KEY = "ttm:theme";
 
+/**
+ * Applies a theme to the document.
+ * @param {string} theme - The theme to apply ('light' or 'dark').
+ */
 function applyTheme(theme) {
   const html = document.documentElement;
   html.setAttribute("data-theme", theme);
   Storage.set(THEME_KEY, theme);
 }
+
+/**
+ * Initializes the theme based on the stored preference.
+ */
 function initTheme() {
   const saved = Storage.get(THEME_KEY, "light");
   applyTheme(saved);
@@ -67,6 +146,10 @@ function initTheme() {
   });
 }
 
+/**
+ * Mounts the authentication component to a root element.
+ * @param {HTMLElement} rootEl - The element to mount the component to.
+ */
 function mountAuth(rootEl) {
   ensureSeeds();
   EventBus.on("app:session_check", () => render(rootEl));
@@ -97,6 +180,11 @@ function mountAuth(rootEl) {
   });
 }
 
+/**
+ * Hashes a string using a simple algorithm.
+ * @param {string} s - The string to hash.
+ * @returns {string} The hashed string.
+ */
 function hash(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) {
@@ -106,21 +194,40 @@ function hash(s) {
   return `${h}`;
 }
 
+/**
+ * Ensures that the basic data structures exist in localStorage.
+ */
 function ensureSeeds() {
   if (!Storage.get(USERS_KEY)) Storage.set(USERS_KEY, []);
   if (!Storage.get(TASKS_KEY)) Storage.set(TASKS_KEY, []);
 }
 
+/**
+ * Gets the current session from localStorage.
+ * @returns {{userId: string}|null} The current session or null.
+ */
 function currentSession() {
   return Storage.get(SESSION_KEY, null);
 }
+
+/**
+ * Sets the current session in localStorage.
+ * @param {string} userId - The ID of the logged-in user.
+ */
 function setSession(userId) {
   Storage.set(SESSION_KEY, { userId });
 }
+
+/**
+ * Clears the current session from localStorage.
+ */
 function clearSession() {
   Storage.remove(SESSION_KEY);
 }
 
+/**
+ * Handles the user logout process.
+ */
 function handleLogout() {
   const session = currentSession();
   if (session) {
@@ -136,6 +243,11 @@ function handleLogout() {
   EventBus.emit("app:session_check");
 }
 
+/**
+ * Handles the user login process.
+ * @param {FormData} fd - The form data from the login form.
+ * @param {HTMLElement} rootEl - The root element of the auth component.
+ */
 function handleLogin(fd, rootEl) {
   ensureSeeds();
   const email = (fd.get("email") || "").trim().toLowerCase();
@@ -172,6 +284,11 @@ function handleLogin(fd, rootEl) {
   showAppSections();
 }
 
+/**
+ * Handles the user registration process.
+ * @param {FormData} fd - The form data from the registration form.
+ * @param {HTMLElement} rootEl - The root element of the auth component.
+ */
 function handleRegister(fd, rootEl) {
   ensureSeeds();
   const name = (fd.get("name") || "").trim();
@@ -212,6 +329,11 @@ function handleRegister(fd, rootEl) {
   showAppSections();
 }
 
+/**
+ * Renders the login form.
+ * @param {HTMLElement} rootEl - The element to render the form in.
+ * @param {object} [state={}] - The state of the form (errors, values).
+ */
 function showLogin(rootEl, state = {}) {
   const { errors = {}, values = {} } = state;
   rootEl.innerHTML = `
@@ -253,6 +375,11 @@ function showLogin(rootEl, state = {}) {
   updateNavVisibility();
 }
 
+/**
+ * Renders the registration form.
+ * @param {HTMLElement} rootEl - The element to render the form in.
+ * @param {object} [state={}] - The state of the form (errors, values).
+ */
 function showRegister(rootEl, state = {}) {
   const { errors = {}, values = {} } = state;
   rootEl.innerHTML = `
@@ -309,6 +436,10 @@ function showRegister(rootEl, state = {}) {
   updateNavVisibility();
 }
 
+/**
+ * Renders the auth component based on the current session state.
+ * @param {HTMLElement} rootEl - The element to render the component in.
+ */
 function render(rootEl) {
   const session = currentSession();
   if (!session) {
@@ -350,6 +481,9 @@ function render(rootEl) {
   updateNavVisibility(true);
 }
 
+/**
+ * Hides the main application sections (tasks, stats).
+ */
 function hideAppSections() {
   document
     .querySelector('[data-js="tasks-section"]')
@@ -358,11 +492,15 @@ function hideAppSections() {
     .querySelector('[data-js="stats-section"]')
     .classList.add("utility-hidden");
 }
+
+/**
+ * Shows the main application sections (tasks, stats).
+ */
 function showAppSections() {
   const stats = document.querySelector('[data-js="stats-section"]');
   const tasks = document.querySelector('[data-js="tasks-section"]');
 
-  tasks.classList.remove("utility-hidden"); //añadi esto para que cargue los graficos este la sesion iniciada o si recien se inicia
+  tasks.classList.remove("utility-hidden");
   stats.classList.remove("utility-hidden");
 
   document
@@ -380,6 +518,10 @@ function showAppSections() {
   }, 100);
 }
 
+/**
+ * Updates the visibility of the navigation buttons based on login state.
+ * @param {boolean} [isLogged] - Whether the user is logged in.
+ */
 function updateNavVisibility(isLogged = !!Storage.get(SESSION_KEY)) {
   const logoutBtn = document.querySelector('[data-js="logout-btn"]');
   if (!logoutBtn) return;
@@ -391,10 +533,19 @@ function updateNavVisibility(isLogged = !!Storage.get(SESSION_KEY)) {
     logoutBtn.onclick = null;
   }
 }
+
+/**
+ * A shorthand for document.querySelector.
+ * @param {string} sel - The CSS selector.
+ * @returns {HTMLElement|null} The selected element.
+ */
 function qs(sel) {
   return document.querySelector(sel);
 }
 
+/**
+ * Renders the entire task board, including all columns and tasks.
+ */
 function renderBoard() {
   const tasks = Storage.get(TASKS_KEY, []);
   const cols = {
@@ -451,6 +602,11 @@ function renderBoard() {
   }
 }
 
+/**
+ * Escapes HTML special characters in a string.
+ * @param {string} s - The string to escape.
+ * @returns {string} The escaped string.
+ */
 function escapeHtml(s) {
   return s.replace(
     /[&<>"']/g,
@@ -461,6 +617,9 @@ function escapeHtml(s) {
   );
 }
 
+/**
+ * Initializes the task board, including the form for adding new tasks.
+ */
 function initBoard() {
   const form = document.querySelector('[data-js="board-add-form"]');
   form.addEventListener("submit", (e) => {
