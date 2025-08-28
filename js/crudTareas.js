@@ -1,9 +1,7 @@
 function renderEditTask(id) {
   const tasks = Storage.get(TASKS_KEY);
   const selectedTask = tasks.find((item) => item.id === id);
-  console.log(selectedTask);
 
-  // const USERS = ["john doe", "maria", "jose"];
   const USERS = JSON.parse(localStorage.getItem("ttm:users") || "[]");
 
   const el = document.querySelector('[data-js="modal-overlay"]');
@@ -153,8 +151,6 @@ function renderEditTask(id) {
     }
   });
 }
-
-function updatedTask() {}
 
 function handleClickUpdateTask(task) {
   const updatedTask = {
