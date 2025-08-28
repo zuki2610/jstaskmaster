@@ -192,6 +192,10 @@ function handleClickUpdateTask(task) {
   }
 
   if (typeof renderUsers === "function") renderUsers();
+
+  if (typeof initStatsSection === "function") {
+    initStatsSection();
+  }
 }
 
 function handleCloseTaskModal() {
